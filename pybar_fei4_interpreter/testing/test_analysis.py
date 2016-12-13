@@ -6,7 +6,6 @@ import unittest
 import tables as tb
 import numpy as np
 
-import pybar_fei4_interpreter
 from pybar_fei4_interpreter import analysis_utils
 from pybar_fei4_interpreter import data_struct
 from pybar_fei4_interpreter.data_interpreter import PyDataInterpreter
