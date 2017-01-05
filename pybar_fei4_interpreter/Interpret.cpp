@@ -49,6 +49,7 @@ void Interpret::setStandardSettings()
 	_isMetaTableV2 = true;
 	_alignAtTriggerNumber = false;
 	_useTriggerTimeStamp = false;
+	_TriggerFormat = TRIGGER_FORMAT_TRIGGER_COUNTER;
 	_useTdcTriggerTimeStamp = false;
 	_maxTdcDelay = 255;
 	_alignAtTdcWord = false;
@@ -168,13 +169,20 @@ bool Interpret::interpretRawData(unsigned int* pDataWords, const unsigned int& p
 			}
 			tTriggerWord++; // increase event trigger word counter
 
-			if (!_useTriggerTimeStamp)
-				tTriggerNumber = TRIGGER_NUMBER_MACRO_NEW(tActualWord); // actual trigger number
-			else
-				tTriggerNumber = TRIGGER_TIME_STAMP_MACRO(tActualWord); // actual trigger number is a time stamp
-
+			if (_TriggerFormat == 0) { // TRIGGER COUNTER mode
+				tTriggerNumber = TRIGGER_NUMBER_MACRO_NEW(tActualWord); // 31 bit trigger number
+				_TriggerMode = "TRIGGER COUNTER"; // set string for output
+			}
+			else if (_TriggerFormat == 1) { // TIMESTAMP mode
+				tTriggerNumber = TRIGGER_TIME_STAMP_MACRO(tActualWord); // 31 bit time stamp
+				_TriggerMode = "TIMESTAMP"; // set string for output
+			}
+			else if (_TriggerFormat == 2) { // COMBINED trigger mode
+				tTriggerNumber = TRIGGER_NUMBER_MACRO_COMBINED(tActualWord); // 15 bit time stamp + 16 bit trigger number
+				_TriggerMode = "COMBINED"; // set string for output
+			}
 			if (Basis::debugSet()) {
-				if (!_useTriggerTimeStamp)
+				if (_TriggerFormat == 2 || _TriggerFormat == 0)
 					debug(std::string(" ") + IntToStr(_nDataWords) + " TR NUMBER " + IntToStr(tTriggerNumber) + "\t WORD " + IntToStr(tActualWord) + "\t" + LongIntToStr(_nEvents));
 				else
 					debug(std::string(" ") + IntToStr(_nDataWords) + " TR TIME STAMP " + IntToStr(tTriggerNumber) + "\t WORD " + IntToStr(tActualWord) + "\t" + LongIntToStr(_nEvents));
@@ -183,7 +191,7 @@ bool Interpret::interpretRawData(unsigned int* pDataWords, const unsigned int& p
 			// TLU error handling
 			if (!_firstTriggerNrSet)
 				_firstTriggerNrSet = true;
-			else if (!_useTriggerTimeStamp && (_lastTriggerNumber + 1 != tTriggerNumber) && !(_lastTriggerNumber == _maxTriggerNumber && tTriggerNumber == 0)) {
+			else if ((_TriggerFormat == 2 || _TriggerFormat == 0) && (_lastTriggerNumber + 1 != tTriggerNumber) && !(_lastTriggerNumber == _maxTriggerNumber && tTriggerNumber == 0)) {
 				addTriggerErrorCode(__TRG_NUMBER_INC_ERROR);
 				if (Basis::warningSet())
 					warning("interpretRawData: Trigger Number not increasing by 1 (old/new): " + IntToStr(_lastTriggerNumber) + "/" + IntToStr(tTriggerNumber) + " at event " + LongIntToStr(_nEvents));
@@ -527,6 +535,12 @@ void Interpret::useTriggerTimeStamp(bool useTriggerTimeStamp)
 	_useTriggerTimeStamp = useTriggerTimeStamp;
 }
 
+void Interpret::setTriggerFormat(const unsigned int& rTriggerFormat)
+{
+	info("TriggerFormat()");
+	_TriggerFormat = rTriggerFormat;
+}
+
 void Interpret::useTdcTriggerTimeStamp(bool useTdcTriggerTimeStamp)
 {
 	info("useTdcTriggerTimeStamp()");
@@ -602,6 +616,7 @@ void Interpret::printSummary()
 	std::cout << "# Value Records     " << std::right << std::setw(15) << _nValueRecords << "\n";
 	std::cout << "# Service Records   " << std::right << std::setw(15) << _nServiceRecords << "\n";
 	std::cout << "# TDC Words         " << std::right << std::setw(15) << _nTDCWords << "\n";
+	std::cout << "# Trigger Format    " << std::right << std::setw(15) << _TriggerMode << "\n";
 	std::cout << "# Trigger Words     " << std::right << std::setw(15) << _nTriggers << "\n";
 	std::cout << "# Other Words       " << std::right << std::setw(15) << _nOtherWords << "\n";
 	std::cout << "# Unknown Words     " << std::right << std::setw(15) << _nUnknownWords << "\n\n";

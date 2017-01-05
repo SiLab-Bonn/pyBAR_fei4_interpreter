@@ -5,6 +5,7 @@
 #include <string>
 #include <ctime>
 #include <cmath>
+#include <string>
 
 #include "Basis.h"
 #include "defines.h"
@@ -51,7 +52,8 @@ public:
 	void alignAtTdcWord(bool alignAtTdcWord = true);								//new events are created if TDC word occurs and event structure of event before is complete
 	void useTdcTriggerTimeStamp(bool useTdcTriggerTimeStamp = true);				//true: TDC time stamp is the delay between trigger/TDC leading edge, False: time stamp counter
 	void setMaxTdcDelay(const unsigned int& rMaxTdcDelay);							//sets the maximum TDC delay, only TDC words with TDC delay values < rMaxTdcDelay will be considered as fitting TDC words, otherwise it is fully ignored
-	void useTriggerTimeStamp(bool useTriggerTimeStamp = true);						//trigger number is giving you a clock count and not a total count
+	void useTriggerTimeStamp(bool useTriggerTimeStamp = true);	                    //trigger number is giving you a clock count and not a total count
+	void setTriggerFormat(const unsigned int& rTriggerFormat);							//0: 15 bit time stamp + 16 bit trigger number, 1: 31 bit trigger number, 2: 31 bit time stamp
 	void setMaxTriggerNumber(const unsigned int& rMaxTriggerNumber);
 
 	void addEvent(); // increases the event counter, adds the actual hits/error/SR codes
@@ -155,6 +157,8 @@ private:
 	bool _alignAtTriggerNumber;					//set to true to force event recognition by trigger number
 	bool _alignAtTdcWord;						//set to true to force event recognition by TDC word if event before is complete
 	bool _useTdcTriggerTimeStamp;				//set to true to use the TDC trigger distance to fill the TDC time stamp otherwise use counter
+	unsigned int _TriggerFormat;				//set trigger format
+	std::string _TriggerMode;					//indicates trigger format as string for nicer output
 	bool _useTriggerTimeStamp;					//set to true to use the trigger value as a clock count
 	unsigned int _maxTriggerNumber;				//maximum trigger trigger number
 
