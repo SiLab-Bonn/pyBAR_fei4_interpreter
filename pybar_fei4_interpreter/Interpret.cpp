@@ -640,7 +640,7 @@ void Interpret::printSummary()
 
 void Interpret::printStatus()
 {
-	std::cout << "config variables\n";
+	std::cout << "configuration parameters\n";
 	std::cout << "_NbCID " << _NbCID << "\n";
 	std::cout << "_maxTot " << _maxTot << "\n";
 	std::cout << "_fEI4B " << _fEI4B << "\n";
@@ -653,7 +653,7 @@ void Interpret::printStatus()
 	std::cout << "_useTdcTriggerTimeStamp " << _useTdcTriggerTimeStamp << "\n";
 	std::cout << "_maxTdcDelay " << _maxTdcDelay << "\n";
 
-	std::cout << "\none event variables\n";
+	std::cout << "\ncurrent event variables\n";
 	std::cout << "tNdataWords " << tNdataWords << "\n";
 	std::cout << "tNdataHeader " << tNdataHeader << "\n";
 	std::cout << "tNdataRecord " << tNdataRecord << "\n";
@@ -671,7 +671,7 @@ void Interpret::printStatus()
 	std::cout << "tTdcTimeStamp" << tTdcTimeStamp << "\n";
 	std::cout << "_lastTriggerNumber " << _lastTriggerNumber << "\n";
 
-	std::cout << "\ncounters/flags for the total raw data processing\n";
+	std::cout << "\ncounters/flags for the raw data processing\n";
 	std::cout << "_nTriggers " << _nTriggers << "\n";
 	std::cout << "_nEvents " << _nEvents << "\n";
 	std::cout << "_nMaxHitsPerEvent " << _nMaxHitsPerEvent << "\n";
