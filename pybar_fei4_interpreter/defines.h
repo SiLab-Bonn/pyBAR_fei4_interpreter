@@ -144,12 +144,19 @@ const unsigned int RAW_DATA_MIN_ROW=1;
 const unsigned int RAW_DATA_MAX_ROW=336;
 
 //trigger word macros
-#define TRIGGER_WORD_HEADER_MASK_NEW 0x80000000 // 1xxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx, x may contain user data
-#define TRIGGER_NUMBER_MASK_NEW		0x0000FFFF //trigger number is in the low word
-#define TRIGGER_TIME_STAMP_MASK		0x7FFF0000 //trigger number is in the low word
-#define TRIGGER_WORD_MACRO_NEW(X)	(((TRIGGER_WORD_HEADER_MASK_NEW & X) == TRIGGER_WORD_HEADER_MASK_NEW) ? true : false) //true if data word is trigger word
-#define TRIGGER_NUMBER_MACRO_NEW(X)	(TRIGGER_NUMBER_MASK_NEW & X) //calculates the trigger number from a trigger word
-#define TRIGGER_TIME_STAMP_MACRO(X)	(TRIGGER_TIME_STAMP_MASK & X) //calculates the trigger time stamp from a trigger word
+#define TRIGGER_WORD_HEADER_MASK				0x80000000 // 1xxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx, 31bit trigger data
+#define TRIGGER_DATA_MASK						0x7FFFFFFF //trigger data (either trigger number or time stamp)
+#define TRIGGER_NUMBER_COMBINED_MASK			0x0000FFFF //trigger number when using TLU trigger format 2 (combined data)
+#define TRIGGER_TIME_STAMP_COMBINED_MASK		0x7FFF0000 //trigger time stamp when using TLU trigger format 2 (combined data)
+#define TRIGGER_WORD_MACRO(X)					(((TRIGGER_WORD_HEADER_MASK & X) == TRIGGER_WORD_HEADER_MASK) ? true : false) //true if data word is trigger word
+#define TRIGGER_DATA_MACRO(X)					(TRIGGER_DATA_MASK & X) //calculates the 31bit trigger data (either trigger number or time stamp) from a trigger word
+#define TRIGGER_NUMBER_COMBINED_MACRO(X)		(TRIGGER_NUMBER_COMBINED_MASK & X) //calculates the 16bit trigger number from a trigger word when using TLU trigger format 2 (combined data)
+#define TRIGGER_TIME_STAMP_COMBINED_MACRO(X)	(TRIGGER_TIME_STAMP_COMBINED_MASK & X) //calculates the 15bit time stamp from a trigger word when using TLU trigger format 2 (combined data)
+
+// TLU trigger data format
+#define TRIGGER_FROMAT_TRIGGER_NUMBER	0 //0: trigger word contains trigger counter
+#define TRIGGER_FROMAT_TIME_STAMP		1 //1: trigger word contains time stamp
+#define TRIGGER_FROMAT_COMBINED			2 //2: trigger word contains both, 2: 15bit time stamp and 16bit trigger number
 
 //TDC macros
 #define __N_TDC_VALUES 4096

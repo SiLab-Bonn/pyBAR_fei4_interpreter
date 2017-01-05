@@ -61,7 +61,7 @@ cdef extern from "Interpret.h":
         unsigned int getNmetaDataWord()
         void alignAtTriggerNumber(cpp_bool alignAtTriggerNumber)
         void alignAtTdcWord(cpp_bool alignAtTdcWord)
-        void useTriggerTimeStamp(cpp_bool useTriggerTimeStamp)
+        void setTriggerDataFormat(const unsigned int& rTriggerDataFormat)
         void setMaxTdcDelay(const unsigned int& rMaxTdcDelay)
         void useTdcTriggerTimeStamp(cpp_bool useTdcTriggerTimeStamp)
         void setMaxTriggerNumber(const unsigned int& rMaxTriggerNumber)
@@ -168,8 +168,8 @@ cdef class PyDataInterpreter:
         self.thisptr.alignAtTriggerNumber(<cpp_bool> use_trigger_number)
     def align_at_tdc(self, use_tdc_word):
         self.thisptr.alignAtTdcWord(<cpp_bool> use_tdc_word)
-    def use_trigger_time_stamp(self, use_trigger_time_stamp):
-        self.thisptr.useTriggerTimeStamp(<cpp_bool> use_trigger_time_stamp)
+    def set_trigger_data_format(self, trigger_data_format):
+        self.thisptr.setTriggerDataFormat(<const unsigned int&> trigger_data_format)
     def use_tdc_trigger_time_stamp(self, use_tdc_trigger_time_stamp):
         self.thisptr.useTdcTriggerTimeStamp(<cpp_bool> use_tdc_trigger_time_stamp)
     def get_n_meta_data_event(self):
