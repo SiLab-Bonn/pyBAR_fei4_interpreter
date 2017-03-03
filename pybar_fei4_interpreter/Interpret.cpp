@@ -48,7 +48,7 @@ void Interpret::setStandardSettings()
 	_createEmptyEventHits = false;
 	_isMetaTableV2 = true;
 	_alignAtTriggerNumber = false;
-	_useTriggerTimeStamp = false;
+	_TriggerDataFormat = TRIGGER_FROMAT_TRIGGER_NUMBER;
 	_useTdcTriggerTimeStamp = false;
 	_maxTdcDelay = 255;
 	_alignAtTdcWord = false;
@@ -167,23 +167,37 @@ bool Interpret::interpretRawData(unsigned int* pDataWords, const unsigned int& p
 
 			}
 			tTriggerWord++; // increase event trigger word counter
-
-			if (!_useTriggerTimeStamp)
-				tTriggerNumber = TRIGGER_NUMBER_MACRO_NEW(tActualWord); // actual trigger number
-			else
-				tTriggerNumber = TRIGGER_TIME_STAMP_MACRO(tActualWord); // actual trigger number is a time stamp
-
-			if (Basis::debugSet()) {
-				if (!_useTriggerTimeStamp)
-					debug(std::string(" ") + IntToStr(_nDataWords) + " TR NUMBER " + IntToStr(tTriggerNumber) + "\t WORD " + IntToStr(tActualWord) + "\t" + LongIntToStr(_nEvents));
-				else
-					debug(std::string(" ") + IntToStr(_nDataWords) + " TR TIME STAMP " + IntToStr(tTriggerNumber) + "\t WORD " + IntToStr(tActualWord) + "\t" + LongIntToStr(_nEvents));
+			if (_TriggerDataFormat == TRIGGER_FROMAT_TRIGGER_NUMBER) { // trigger number
+				tTriggerNumber = TRIGGER_DATA_MACRO(tActualWord); // 31bit trigger number
+				tTriggerTimeStamp = 0; // 31bit time stamp
 			}
-
+			else if (_TriggerDataFormat == TRIGGER_FROMAT_TIME_STAMP) { // time stamp
+				// for compatibility assign to tTriggerNumber
+				tTriggerNumber = 0; // 31bit trigger number
+				tTriggerTimeStamp = TRIGGER_DATA_MACRO(tActualWord); // 31bit time stamp
+			}
+			else if (_TriggerDataFormat == TRIGGER_FROMAT_COMBINED) { // combined
+				tTriggerNumber = TRIGGER_NUMBER_COMBINED_MACRO(tActualWord); // 16bit trigger number
+				tTriggerTimeStamp = TRIGGER_TIME_STAMP_COMBINED_MACRO(tActualWord); // 15bit time stamp
+			}
+			else {
+				throw std::out_of_range("Invalid mode for trigger data format.");
+			}
+			if (Basis::debugSet()) {
+				if (_TriggerDataFormat == TRIGGER_FROMAT_TRIGGER_NUMBER) { // trigger number
+					debug(std::string(" ") + IntToStr(_nDataWords) + " TW NUMBER " + IntToStr(tTriggerNumber) + "\t WORD " + IntToStr(tActualWord) + "\t" + LongIntToStr(_nEvents));
+				}
+				else if (_TriggerDataFormat == TRIGGER_FROMAT_TIME_STAMP) { // time stamp
+					debug(std::string(" ") + IntToStr(_nDataWords) + " TW TIME STAMP " + IntToStr(tTriggerTimeStamp) + "\t WORD " + IntToStr(tActualWord) + "\t" + LongIntToStr(_nEvents));
+				}
+				else if (_TriggerDataFormat == TRIGGER_FROMAT_COMBINED) { // combined
+					debug(std::string(" ") + IntToStr(_nDataWords) + " TW TIME STAMP " + IntToStr(tTriggerTimeStamp) + " TW NUMBER " + IntToStr(tTriggerNumber) + "\t WORD " + IntToStr(tActualWord) + "\t" + LongIntToStr(_nEvents));
+			    }
+			}
 			// TLU error handling
 			if (!_firstTriggerNrSet)
 				_firstTriggerNrSet = true;
-			else if (!_useTriggerTimeStamp && (_lastTriggerNumber + 1 != tTriggerNumber) && !(_lastTriggerNumber == _maxTriggerNumber && tTriggerNumber == 0)) {
+			else if ((_TriggerDataFormat != TRIGGER_FROMAT_TIME_STAMP) && (_lastTriggerNumber + 1 != tTriggerNumber) && !(_lastTriggerNumber == _maxTriggerNumber && tTriggerNumber == 0)) {
 				addTriggerErrorCode(__TRG_NUMBER_INC_ERROR);
 				if (Basis::warningSet())
 					warning("interpretRawData: Trigger Number not increasing by 1 (old/new): " + IntToStr(_lastTriggerNumber) + "/" + IntToStr(tTriggerNumber) + " at event " + LongIntToStr(_nEvents));
@@ -191,8 +205,11 @@ bool Interpret::interpretRawData(unsigned int* pDataWords, const unsigned int& p
 
 			if (tTriggerWord == 1)  			// event trigger number is trigger number of first trigger word within the event
 				tEventTriggerNumber = tTriggerNumber;
+				tEventTriggerTimeStamp = tTriggerTimeStamp;
 
+			// store for next event in case of missing trigger word
 			_lastTriggerNumber = tTriggerNumber;
+			_lastTriggerTimeStamp = tTriggerTimeStamp;
 		}
 		else if (getInfoFromServiceRecord(tActualWord, tActualSRcode, tActualSRcounter)) { //data word is service record
 			if (Basis::debugSet())
@@ -439,6 +456,7 @@ void Interpret::resetCounters()
 	_firstTriggerNrSet = false;
 	_firstTdcSet = false;
 	_lastTriggerNumber = 0;
+	_lastTriggerTimeStamp = 0;
 	_dataWordIndex = 0;
 	resetTriggerErrorCounterArray();
 	resetErrorCounterArray();
@@ -461,7 +479,9 @@ void Interpret::resetEventVariables()
 	tTdcCount = 0;
 	tTdcTimeStamp = 0;
 	tTriggerNumber = 0;
+	tTriggerTimeStamp = 0;
 	tEventTriggerNumber = 0;
+	tEventTriggerTimeStamp = 0;
 	tStartBCID = 0;
 	tStartLVL1ID = 0;
 	tHitBufferIndex = 0;
@@ -521,10 +541,10 @@ void Interpret::alignAtTdcWord(bool alignAtTdcWord)
 	_alignAtTdcWord = alignAtTdcWord;
 }
 
-void Interpret::useTriggerTimeStamp(bool useTriggerTimeStamp)
+void Interpret::setTriggerDataFormat(const unsigned int& rTriggerDataFormat)
 {
-	info("useTriggerTimeStamp()");
-	_useTriggerTimeStamp = useTriggerTimeStamp;
+	info("setTriggerDataFormat()");
+	_TriggerDataFormat = rTriggerDataFormat;
 }
 
 void Interpret::useTdcTriggerTimeStamp(bool useTdcTriggerTimeStamp)
@@ -640,7 +660,7 @@ void Interpret::printSummary()
 
 void Interpret::printStatus()
 {
-	std::cout << "config variables\n";
+	std::cout << "configuration parameters\n";
 	std::cout << "_NbCID " << _NbCID << "\n";
 	std::cout << "_maxTot " << _maxTot << "\n";
 	std::cout << "_fEI4B " << _fEI4B << "\n";
@@ -649,11 +669,11 @@ void Interpret::printStatus()
 	std::cout << "_stopDebugEvent " << _stopDebugEvent << "\n";
 	std::cout << "_alignAtTriggerNumber " << _alignAtTriggerNumber << "\n";
 	std::cout << "_alignAtTdcWord " << _alignAtTdcWord << "\n";
-	std::cout << "_useTriggerTimeStamp " << _useTriggerTimeStamp << "\n";
+	std::cout << "_TriggerDataFormat " << _TriggerDataFormat << "\n";
 	std::cout << "_useTdcTriggerTimeStamp " << _useTdcTriggerTimeStamp << "\n";
 	std::cout << "_maxTdcDelay " << _maxTdcDelay << "\n";
 
-	std::cout << "\none event variables\n";
+	std::cout << "\ncurrent event variables\n";
 	std::cout << "tNdataWords " << tNdataWords << "\n";
 	std::cout << "tNdataHeader " << tNdataHeader << "\n";
 	std::cout << "tNdataRecord " << tNdataRecord << "\n";
@@ -664,14 +684,16 @@ void Interpret::printStatus()
 	std::cout << "tErrorCode " << tErrorCode << "\n";
 	std::cout << "tServiceRecord " << tServiceRecord << "\n";
 	std::cout << "tTriggerNumber " << tTriggerNumber << "\n";
+	std::cout << "tTriggerTimeStamp " << tTriggerTimeStamp << "\n";
 	std::cout << "tTotalHits " << tTotalHits << "\n";
 	std::cout << "tBCIDerror " << tBCIDerror << "\n";
 	std::cout << "tTriggerWord " << tTriggerWord << "\n";
 	std::cout << "tTdcCount " << tTdcCount << "\n";
 	std::cout << "tTdcTimeStamp" << tTdcTimeStamp << "\n";
 	std::cout << "_lastTriggerNumber " << _lastTriggerNumber << "\n";
+	std::cout << "_lastTriggerTimeStamp " << _lastTriggerTimeStamp << "\n";
 
-	std::cout << "\ncounters/flags for the total raw data processing\n";
+	std::cout << "\ncounters/flags for the raw data processing\n";
 	std::cout << "_nTriggers " << _nTriggers << "\n";
 	std::cout << "_nEvents " << _nEvents << "\n";
 	std::cout << "_nMaxHitsPerEvent " << _nMaxHitsPerEvent << "\n";
@@ -725,6 +747,7 @@ void Interpret::reset()
 	_startWordIndex = 0;
 	// initialize SRAM variables to 0
 	tTriggerNumber = 0;
+	tTriggerTimeStamp = 0;
 	tActualLVL1ID = 0;
 	tActualBCID = 0;
 	tActualSRcode= 0;
@@ -744,6 +767,7 @@ bool Interpret::addHit(const unsigned char& pRelBCID, const unsigned short int& 
 	if (tHitBufferIndex < __MAXHITBUFFERSIZE) {
 		_hitBuffer[tHitBufferIndex].event_number = _nEvents;
 		_hitBuffer[tHitBufferIndex].trigger_number = tEventTriggerNumber;
+		_hitBuffer[tHitBufferIndex].trigger_time_stamp = tEventTriggerTimeStamp;
 		_hitBuffer[tHitBufferIndex].relative_BCID = pRelBCID;
 		_hitBuffer[tHitBufferIndex].LVL1ID = pLVL1ID;
 		_hitBuffer[tHitBufferIndex].column = pColumn;
@@ -804,8 +828,10 @@ void Interpret::addEvent()
 	}
 	if (tTriggerWord == 0) {
 		addEventErrorCode(__NO_TRG_WORD);
-		if (_firstTriggerNrSet) // set the last existing trigger number for events without trigger number if trigger numbers exist
+		if (_firstTriggerNrSet) { // set the last existing trigger number for events without trigger number if trigger numbers exist
 			tEventTriggerNumber = _lastTriggerNumber;
+			tEventTriggerTimeStamp = _lastTriggerTimeStamp;
+		}
 	}
 	if (tTriggerWord > 1) {
 		addTriggerErrorCode(__TRG_NUMBER_MORE_ONE);
@@ -846,7 +872,11 @@ void Interpret::addEvent()
 void Interpret::storeEventHits()
 {
 	for (unsigned int i = 0; i < tHitBufferIndex; ++i) {
-		_hitBuffer[i].trigger_number = tEventTriggerNumber; //not needed if trigger number is at the beginning
+		// duplicate trigger number and time stamp for event that have missing trigger data word
+		// usually not needed if trigger data word is at the beginning
+		_hitBuffer[i].trigger_number = tEventTriggerNumber;
+		_hitBuffer[i].trigger_time_stamp = tEventTriggerTimeStamp;
+		// set status bits at the very end
 		_hitBuffer[i].trigger_status = tTriggerError;
 		_hitBuffer[i].event_status = tErrorCode;
 		storeHit(_hitBuffer[i]);
@@ -977,7 +1007,7 @@ bool Interpret::getInfoFromServiceRecord(const unsigned int& pSRAMWORD, unsigned
 
 bool Interpret::isTriggerWord(const unsigned int& pSRAMWORD)
 {
-	if (TRIGGER_WORD_MACRO_NEW(pSRAMWORD))	//data word is trigger word
+	if (TRIGGER_WORD_MACRO(pSRAMWORD))	//data word is trigger word
 		return true;
 	return false;
 }
@@ -1355,7 +1385,7 @@ void Interpret::printInterpretedWords(unsigned int* pDataWords, const unsigned i
 			else
 				std::cout << " UNKNOWN " << tActualWord;
 		else if (isTriggerWord(tActualWord))
-			std::cout << " TRIGGER " << TRIGGER_NUMBER_MACRO_NEW(tActualWord);
+			std::cout << " TRIGGER " << TRIGGER_DATA_MACRO(tActualWord);
 		else if (getInfoFromServiceRecord(tActualWord, tActualSRcode, tActualSRcounter))
 			std::cout << " SR " << tActualSRcode;
 		else if (isAddressRecord(tActualWord, tActualAddressRecord, tActualAddressRecordType))

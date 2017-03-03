@@ -101,6 +101,7 @@ class TestAnalysis(unittest.TestCase):
     def test_data_alignement(self):  # Test if the data alignment is correct (important to detect 32/64 bit related issues)
         hits = np.empty((1,), dtype=[('event_number', np.uint64),
                                      ('trigger_number', np.uint32),
+                                     ('trigger_time_stamp', np.uint32),
                                      ('relative_BCID', np.uint8),
                                      ('LVL1ID', np.uint16),
                                      ('column', np.uint8),
@@ -159,6 +160,44 @@ class TestAnalysis(unittest.TestCase):
         col_arr, row_arr = convert_data_array(raw_data, filter_func=is_data_record, converter_func=get_col_row_array_from_data_record_array)
         occ_hist_python, _, _ = np.histogram2d(col_arr, row_arr, bins=(80, 336), range=[[1, 80], [1, 336]])
         self.assertTrue(np.all(occ_hist_cpp == occ_hist_python))
+
+    def test_trigger_data_format(self):
+        raw_data = np.array([82411778, 82793472, 82411779, 82794496, 82411780, 82795520, 82379013, 82379014,
+                             82379015, 82379016, 67240383, 82379017, 82379018, 82379019, 82379020, 82379021,
+                             82379022, 82379023, 82379024, 82379025, 3611295745, 82380701, 82380702, 82380703,
+                             82380704, 82380705, 82380706, 82380707, 67240383, 82380708, 82380709, 82380710,
+                             82380711, 82380712, 82380713, 82380714, 82380715, 82380716, 3611361282, 82381368,
+                             82381369, 82381370, 82381371, 82381372, 82381373, 82381374, 67240367, 82381375,
+                             82381376, 82381377, 82381378, 82381379, 82381380, 82381381, 82381382, 82381383,
+                             3611426819, 82382035, 82382036, 82382037, 82382038, 82382039, 82382040, 82382041,
+                             67240383, 82382042, 82382043, 82382044, 82382045, 82382046, 82382047, 82382048,
+                             82382049, 82382050, 3611492356, 82383726, 82383727, 82383728, 82383729, 82383730,
+                             82383731, 82383732, 67240367, 82383733, 82383734, 82383735, 82383736, 82383737,
+                             82383738, 82383739, 82383740, 82383741, 3611557893], np.uint32)
+        raw_data_tlu = np.array([3611295745, 3611361282, 3611426819, 3611492356, 3611557893], np.uint32)
+        interpreter = PyDataInterpreter()
+        histograming = PyDataHistograming()
+        for i in (0, 1, 2):  # 0: trigger data contains trigger number, 1: trigger data contains time stamp, 2: trigger data contains 15bit time stamp and 16bit trigger number
+            interpreter.set_trigger_data_format(i)
+            interpreter.set_trig_count(16)
+            interpreter.set_warning_output(False)
+            histograming.set_no_scan_parameter()
+            histograming.create_occupancy_hist(True)
+            interpreter.interpret_raw_data(raw_data)
+            interpreter.store_event()
+            histograming.add_hits(interpreter.get_hits())
+            hits = interpreter.get_hits()
+            if i == 0:
+                trigger_number_ref = raw_data_tlu & 0x7FFFFFFF
+                trigger_time_stamp_ref = np.zeros_like(raw_data_tlu)
+            elif i == 1:
+                trigger_number_ref = np.zeros_like(raw_data_tlu)
+                trigger_time_stamp_ref = raw_data_tlu & 0x7FFFFFFF
+            elif i == 2:
+                trigger_number_ref = raw_data_tlu & 0x0000FFFF
+                trigger_time_stamp_ref = (raw_data_tlu & 0x7FFF0000) >> 16
+            self.assertTrue(np.all(hits["trigger_number"] == trigger_number_ref))
+            self.assertTrue(np.all(hits["trigger_time_stamp"] == trigger_time_stamp_ref))
 
     def test_analysis_utils_in1d_events(self):  # check compiled get_in1d_sorted function
         event_numbers = np.array([[0, 0, 2, 2, 2, 4, 5, 5, 6, 7, 7, 7, 8], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], dtype=np.int64)

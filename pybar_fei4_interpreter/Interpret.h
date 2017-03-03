@@ -51,7 +51,7 @@ public:
 	void alignAtTdcWord(bool alignAtTdcWord = true);								//new events are created if TDC word occurs and event structure of event before is complete
 	void useTdcTriggerTimeStamp(bool useTdcTriggerTimeStamp = true);				//true: TDC time stamp is the delay between trigger/TDC leading edge, False: time stamp counter
 	void setMaxTdcDelay(const unsigned int& rMaxTdcDelay);							//sets the maximum TDC delay, only TDC words with TDC delay values < rMaxTdcDelay will be considered as fitting TDC words, otherwise it is fully ignored
-	void useTriggerTimeStamp(bool useTriggerTimeStamp = true);						//trigger number is giving you a clock count and not a total count
+	void setTriggerDataFormat(const unsigned int& rTriggerFormat);					//0: trigger counter, 1: time stamp, 2: 15bit time stamp and 16bit trigger number
 	void setMaxTriggerNumber(const unsigned int& rMaxTriggerNumber);
 
 	void addEvent(); // increases the event counter, adds the actual hits/error/SR codes
@@ -155,7 +155,7 @@ private:
 	bool _alignAtTriggerNumber;					//set to true to force event recognition by trigger number
 	bool _alignAtTdcWord;						//set to true to force event recognition by TDC word if event before is complete
 	bool _useTdcTriggerTimeStamp;				//set to true to use the TDC trigger distance to fill the TDC time stamp otherwise use counter
-	bool _useTriggerTimeStamp;					//set to true to use the trigger value as a clock count
+	unsigned int _TriggerDataFormat;		    //set trigger data format
 	unsigned int _maxTriggerNumber;				//maximum trigger trigger number
 
 	// one event variables
@@ -169,10 +169,12 @@ private:
 	unsigned short tErrorCode;					//event error code
 	unsigned int tServiceRecord;				//event service records
 	unsigned int tEventTriggerNumber;           //event trigger number
+	unsigned int tEventTriggerTimeStamp;        //event time stamp
 	unsigned int tTotalHits;                    //event hits
 	bool tBCIDerror;						 	//set to true if event data is incomplete to omit the actual event for clustering
 	unsigned int tTriggerWord;				    //count the trigger words per event
 	unsigned int _lastTriggerNumber;            //trigger number of last event
+	unsigned int _lastTriggerTimeStamp;         //trigger time stamp of last event
 	unsigned int _startWordIndex;				//the absolute word index of the first word of the actual event
 	unsigned short tTdcCount;					//the TDC count value of the actual event, if no TDC word occurred this value is zero
 	unsigned char tTdcTimeStamp;				//the TDC time stamp of the actual event, if no TDC word occurred this value is zero
@@ -183,9 +185,6 @@ private:
 	unsigned int _nMaxHitsPerEvent;				//number of the maximum hits per event
 	unsigned int _nEmptyEvents;				  	//number of events with no records
 	unsigned int _nIncompleteEvents;			//number of events with incomplete data structure (# data header != _NbCID)
-
-
-
 	unsigned int _nDataHeaders;					//total number of data headers found
 	unsigned int _nDataRecords;					//total number of data records found
 	unsigned int _nAddressRecords;				//total number of address records found
@@ -224,7 +223,8 @@ private:
 	unsigned int* _serviceRecordCounter;     //SR histogram
 
 	// temporary variables set according to the actual SRAM word
-	unsigned int tTriggerNumber;			//trigger number of actual trigger number word
+	unsigned int tTriggerNumber;			//trigger number of actual trigger word
+	unsigned int tTriggerTimeStamp;			//trigger time stamp of actual trigger word
 	unsigned int tActualLVL1ID;				//LVL1ID of the actual data header
 	unsigned int tActualBCID;				//BCID of the actual data header
 	unsigned int tActualSRcode;				//Service record code of the actual service record
@@ -233,4 +233,3 @@ private:
 	// counter variables for the actual raw data file
 	unsigned int _dataWordIndex;			//the word index of the actual raw data file, needed for event number calculation
 };
-

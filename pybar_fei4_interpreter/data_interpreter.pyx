@@ -61,7 +61,7 @@ cdef extern from "Interpret.h":
         unsigned int getNmetaDataWord()
         void alignAtTriggerNumber(cpp_bool alignAtTriggerNumber)
         void alignAtTdcWord(cpp_bool alignAtTdcWord)
-        void useTriggerTimeStamp(cpp_bool useTriggerTimeStamp)
+        void setTriggerDataFormat(const unsigned int& rTriggerDataFormat)
         void setMaxTdcDelay(const unsigned int& rMaxTdcDelay)
         void useTdcTriggerTimeStamp(cpp_bool useTdcTriggerTimeStamp)
         void setMaxTriggerNumber(const unsigned int& rMaxTriggerNumber)
@@ -92,7 +92,7 @@ cdef data_to_numpy_array_uint32(cnp.uint32_t* ptr, cnp.npy_intp N):
     cdef cnp.ndarray[cnp.uint32_t, ndim=1] arr = cnp.PyArray_SimpleNewFromData(1, <cnp.npy_intp*> &N, cnp.NPY_UINT32, <cnp.uint32_t*> ptr)
     #PyArray_ENABLEFLAGS(arr, np.NPY_OWNDATA)
     return arr
-cdef hit_dt = cnp.dtype([('event_number', '<i8'), ('trigger_number', '<u4'), ('relative_BCID', '<u1'), ('LVL1ID', '<u2'), ('column', '<u1'), ('row', '<u2'), ('tot', '<u1'), ('BCID', '<u2'), ('TDC', '<u2'), ('TDC_time_stamp', '<u1'), ('trigger_status', '<u1'), ('service_record', '<u4'), ('event_status', '<u2')])
+cdef hit_dt = cnp.dtype([('event_number', '<i8'), ('trigger_number', '<u4'), ('trigger_time_stamp', '<u4'), ('relative_BCID', '<u1'), ('LVL1ID', '<u2'), ('column', '<u1'), ('row', '<u2'), ('tot', '<u1'), ('BCID', '<u2'), ('TDC', '<u2'), ('TDC_time_stamp', '<u1'), ('trigger_status', '<u1'), ('service_record', '<u4'), ('event_status', '<u2')])
 cdef hit_data_to_numpy_array(void* ptr, cnp.npy_intp N):
     cdef cnp.ndarray[numpy_hit_info, ndim=1] arr = cnp.PyArray_SimpleNewFromData(1, <cnp.npy_intp*> &N, cnp.NPY_INT8, <void*> ptr).view(hit_dt)
     arr.setflags(write=False)  # protect the hit data
@@ -168,8 +168,8 @@ cdef class PyDataInterpreter:
         self.thisptr.alignAtTriggerNumber(<cpp_bool> use_trigger_number)
     def align_at_tdc(self, use_tdc_word):
         self.thisptr.alignAtTdcWord(<cpp_bool> use_tdc_word)
-    def use_trigger_time_stamp(self, use_trigger_time_stamp):
-        self.thisptr.useTriggerTimeStamp(<cpp_bool> use_trigger_time_stamp)
+    def set_trigger_data_format(self, trigger_data_format):
+        self.thisptr.setTriggerDataFormat(<const unsigned int&> trigger_data_format)
     def use_tdc_trigger_time_stamp(self, use_tdc_trigger_time_stamp):
         self.thisptr.useTdcTriggerTimeStamp(<cpp_bool> use_tdc_trigger_time_stamp)
     def get_n_meta_data_event(self):
