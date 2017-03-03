@@ -15,7 +15,8 @@
 //structure to store the hits
 typedef struct HitInfo{
 	int64_t event_number;			//event number value (unsigned long long: 0 to 18,446,744,073,709,551,615)
-	unsigned int trigger_number;	//external trigger number for read out system
+	unsigned int trigger_number;	//trigger number
+	unsigned int trigger_time_stamp;//trigger time stamp
 	unsigned char relative_BCID;	//relative BCID value (unsigned char: 0 to 255)
 	unsigned short int LVL1ID;		//LVL1ID (unsigned short int: 0 to 65.535)
 	unsigned char column;			//column value (unsigned char: 0 to 255)
@@ -32,7 +33,8 @@ typedef struct HitInfo{
 //structure to store the hits with cluster info
 typedef struct ClusterHitInfo{
 	int64_t event_number;			//event number value (unsigned long long: 0 to 18,446,744,073,709,551,615)
-	unsigned int trigger_number;	//external trigger number for read out system
+	unsigned int trigger_number;	//trigger number
+	unsigned int trigger_time_stamp;//trigger time stamp
 	unsigned char relative_BCID;	//relative BCID value (unsigned char: 0 to 255)
 	unsigned short int LVL1ID;		//LVL1ID (unsigned short int: 0 to 65.535)
 	unsigned char column;			//column value (unsigned char: 0 to 255)

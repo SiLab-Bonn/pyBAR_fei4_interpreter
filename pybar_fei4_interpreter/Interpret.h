@@ -169,10 +169,12 @@ private:
 	unsigned short tErrorCode;					//event error code
 	unsigned int tServiceRecord;				//event service records
 	unsigned int tEventTriggerNumber;           //event trigger number
+	unsigned int tEventTriggerTimeStamp;        //event time stamp
 	unsigned int tTotalHits;                    //event hits
 	bool tBCIDerror;						 	//set to true if event data is incomplete to omit the actual event for clustering
 	unsigned int tTriggerWord;				    //count the trigger words per event
 	unsigned int _lastTriggerNumber;            //trigger number of last event
+	unsigned int _lastTriggerTimeStamp;         //trigger time stamp of last event
 	unsigned int _startWordIndex;				//the absolute word index of the first word of the actual event
 	unsigned short tTdcCount;					//the TDC count value of the actual event, if no TDC word occurred this value is zero
 	unsigned char tTdcTimeStamp;				//the TDC time stamp of the actual event, if no TDC word occurred this value is zero
@@ -183,9 +185,6 @@ private:
 	unsigned int _nMaxHitsPerEvent;				//number of the maximum hits per event
 	unsigned int _nEmptyEvents;				  	//number of events with no records
 	unsigned int _nIncompleteEvents;			//number of events with incomplete data structure (# data header != _NbCID)
-
-
-
 	unsigned int _nDataHeaders;					//total number of data headers found
 	unsigned int _nDataRecords;					//total number of data records found
 	unsigned int _nAddressRecords;				//total number of address records found
