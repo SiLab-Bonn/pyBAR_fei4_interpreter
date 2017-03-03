@@ -151,7 +151,7 @@ const unsigned int RAW_DATA_MAX_ROW=336;
 #define TRIGGER_WORD_MACRO(X)					(((TRIGGER_WORD_HEADER_MASK & X) == TRIGGER_WORD_HEADER_MASK) ? true : false) //true if data word is trigger word
 #define TRIGGER_DATA_MACRO(X)					(TRIGGER_DATA_MASK & X) //calculates the 31bit trigger data (either trigger number or time stamp) from a trigger word
 #define TRIGGER_NUMBER_COMBINED_MACRO(X)		(TRIGGER_NUMBER_COMBINED_MASK & X) //calculates the 16bit trigger number from a trigger word when using TLU trigger format 2 (combined data)
-#define TRIGGER_TIME_STAMP_COMBINED_MACRO(X)	(TRIGGER_TIME_STAMP_COMBINED_MASK & X) //calculates the 15bit time stamp from a trigger word when using TLU trigger format 2 (combined data)
+#define TRIGGER_TIME_STAMP_COMBINED_MACRO(X)	((TRIGGER_TIME_STAMP_COMBINED_MASK & X) >> 16) //calculates the 15bit time stamp from a trigger word when using TLU trigger format 2 (combined data)
 
 // TLU trigger data format
 #define TRIGGER_FROMAT_TRIGGER_NUMBER	0 //0: trigger word contains trigger counter
