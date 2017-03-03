@@ -26,7 +26,8 @@ cdef packed struct numpy_par_info:
 
 cdef packed struct numpy_hit_info:
     cnp.int64_t event_number  # event number value (unsigned long long: 0 to 18,446,744,073,709,551,615)
-    cnp.uint32_t trigger_number  # external trigger number for read out system
+    cnp.uint32_t trigger_number  # trigger number
+    cnp.uint32_t trigger_time_stamp  # trigger time stamp
     cnp.uint8_t relative_BCID  # relative BCID value (unsigned char: 0 to 255)
     cnp.uint16_t LVL1ID  # LVL1ID (unsigned short int: 0 to 65.535)
     cnp.uint8_t column  # column value (unsigned char: 0 to 255)
@@ -41,7 +42,8 @@ cdef packed struct numpy_hit_info:
 
 cdef packed struct numpy_cluster_hit_info:
     cnp.int64_t event_number  # event number value (unsigned long long: 0 to 18,446,744,073,709,551,615)
-    cnp.uint32_t trigger_number  # external trigger number for read out system
+    cnp.uint32_t trigger_number  # trigger number
+    cnp.uint32_t trigger_time_stamp  # trigger time stamp
     cnp.uint8_t relative_BCID  # relative BCID value (unsigned char: 0 to 255)
     cnp.uint16_t LVL1ID  # LVL1ID (unsigned short int: 0 to 65.535)
     cnp.uint8_t column  # column value (unsigned char: 0 to 255)
