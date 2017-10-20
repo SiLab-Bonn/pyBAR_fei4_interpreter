@@ -89,7 +89,7 @@ bool Interpret::interpretRawData(unsigned int* pDataWords, const unsigned int& p
 		tActualTot2 = -1; // TOT2 value stays negative if it can not be set properly in getHitsfromDataRecord()
 		if (getTimefromDataHeader(tActualWord, tActualLVL1ID, tActualBCID)) { // data word is data header if true is returned
 			_nDataHeaders++; // increase global data header counter
-			if (tNdataHeader > _NbCID - 1) { // maximum event window is reached (tNdataHeader > BCIDs, mostly tNdataHeader > 15)
+			if (tNdataHeader >= _NbCID) { // maximum event window is reached (tNdataHeader > BCIDs, mostly tNdataHeader > 15)
 				if (_alignAtTriggerNumber) { // do not create new event
 					addEventErrorCode(__TRUNC_EVENT);
 					if (Basis::warningSet())
@@ -155,17 +155,14 @@ bool Interpret::interpretRawData(unsigned int* pDataWords, const unsigned int& p
 						info("interpretRawData: " + IntToStr(_nDataWords) + " TW " + "\t WORD " + IntToStr(tActualWord) + "\t" + IntToStr(tNdataHeader) + "<" + IntToStr(_NbCID) + " at event " + LongIntToStr(_nEvents) + " event incomplete (adding new event)");
 					addEventErrorCode(__EVENT_INCOMPLETE);
 					addEvent();
-
 				}
 				else if (_firstTriggerNrSet) { // usually the case
 					addEvent();
 				}
-			else { // first word is not always the trigger number
-				if (tNdataHeader > _NbCID - 1)
+			} else if (tNdataHeader >= _NbCID) { // first word is not always the trigger number
 					addEvent();
 			}
 
-			}
 			tTriggerWord++; // increase event trigger word counter
 			if (_TriggerDataFormat == TRIGGER_FROMAT_TRIGGER_NUMBER) { // trigger number
 				tTriggerNumber = TRIGGER_DATA_MACRO(tActualWord); // 31bit trigger number
@@ -203,7 +200,7 @@ bool Interpret::interpretRawData(unsigned int* pDataWords, const unsigned int& p
 					warning("interpretRawData: Trigger Number not increasing by 1 (old/new): " + IntToStr(_lastTriggerNumber) + "/" + IntToStr(tTriggerNumber) + " at event " + LongIntToStr(_nEvents));
 			}
 
-			if (tTriggerWord == 1)  			// event trigger number is trigger number of first trigger word within the event
+			if (tTriggerWord == 1) // event trigger number is trigger number of first trigger word within the event
 				tEventTriggerNumber = tTriggerNumber;
 				tEventTriggerTimeStamp = tTriggerTimeStamp;
 
@@ -330,14 +327,13 @@ bool Interpret::interpretRawData(unsigned int* pDataWords, const unsigned int& p
 					debug(std::string(" ") + IntToStr(_nDataWords) + " UNKNOWN WORD " + IntToStr(tActualWord) + " at event " + LongIntToStr(_nEvents));
 			}
 		}
-
-		if (tBCIDerror) {	//tBCIDerror is raised if BCID is not increasing by 1, most likely due to incomplete data transmission, so start new event, actual word is data header here
+		if (tBCIDerror) { //tBCIDerror is raised if BCID is not increasing by 1, most likely due to incomplete data transmission, so start new event, actual word is data header here
 			if (Basis::warningSet())
 				warning("interpretRawData " + IntToStr(_nDataWords) + " BCID ERROR at event " + LongIntToStr(_nEvents));
 			addEvent();
 			_nIncompleteEvents++;
 			getTimefromDataHeader(tActualWord, tActualLVL1ID, tStartBCID);
-			tNdataHeader = 1;									//tNdataHeader is already 1, because actual word is first data of new event
+			tNdataHeader = 1; //tNdataHeader is already 1, because actual word is first data of new event
 			tStartBCID = tActualBCID;
 			tStartLVL1ID = tActualLVL1ID;
 		}
