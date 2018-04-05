@@ -151,7 +151,7 @@ void Histogram::addHits(HitInfo*& rHitInfo, const unsigned int& rNhits)
 		unsigned int tTdc = rHitInfo[i].TDC;
 		if(tTdc >= __N_TDC_VALUES)
 			throw std::out_of_range("TDC value " + IntToStr(tTdc) + " index out of range.");
-		unsigned int tTdcTriggerDistance = rHitInfo[i].TDC_time_stamp; // when using TDC trigger distance, use TDC timestamp 
+		unsigned int tTdcTriggerDistance = rHitInfo[i].TDC_time_stamp; // when using TDC trigger distance, use TDC timestamp
 		if(tTdcTriggerDistance >= __N_TDC_DIST_VALUES)
 			throw std::out_of_range("TDC distance " + IntToStr(tTdc) + " index out of range.");
 		unsigned int tRelBcid = rHitInfo[i].relative_BCID;
@@ -466,7 +466,7 @@ void Histogram::resetTdcTriggerDistanceArray()
 		}
 	}
 }
-	
+
 void Histogram::deleteTotArray()
 {
   debug("deleteTotArray()");
@@ -513,7 +513,7 @@ void Histogram::resetRelBcidArray()
 	  }
   }
 }
-  
+
 void Histogram::deleteRelBcidArray()
 {
   debug("deleteRelBcidArray");

@@ -77,7 +77,7 @@ private:
 	void allocateTdcPixelArray();
 	void deleteTotPixelArray();
 	void deleteTdcPixelArray();
-	
+
 	unsigned int* _occupancy;			//2d hit histogram for each parameter (in total 3d, linearly sorted via col, row, parameter)
 	unsigned int* _tot;					//ToT histogram
 	float* _meanTot;					//2d hit mean ToT histogram for each parameter
@@ -108,6 +108,6 @@ private:
 	bool _createTdcPixelHist;
 	bool _createTotPixelHist;
 	unsigned int _maxTot; //maximum ToT value (inclusive) considered to be a hit
-	
+
 	int* _parInfo;
 };
