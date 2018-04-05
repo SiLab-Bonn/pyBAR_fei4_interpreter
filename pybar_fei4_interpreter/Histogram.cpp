@@ -677,29 +677,37 @@ void Histogram::calculateThresholdScanArrays(double rMuArray[], double rSigmaArr
 
   unsigned int q_min = min_parameter;
   unsigned int q_max = max_parameter;
-  unsigned int n = getNparameters();
   unsigned int A = rMaxInjections;
-  unsigned int d = (int) ( ((double) q_max - (double) q_min)/(double) (n-1));
+  double d = ((double)q_max - (double)q_min)/(double)(getNparameters()-1);
 
   for(unsigned int i=0; i<RAW_DATA_MAX_COLUMN; ++i){
     for(unsigned int j=0; j<RAW_DATA_MAX_ROW; ++j){
       unsigned int M = 0;
-        
+
       for(unsigned int k=0; k<getNparameters(); ++k){
         M += _occupancy[(size_t)i + (size_t)j * (size_t)RAW_DATA_MAX_COLUMN  + (size_t)k * (size_t)RAW_DATA_MAX_COLUMN * (size_t)RAW_DATA_MAX_ROW];
       }
-      double threshold = (double) q_max - d*(double)M/(double)A;
+      double threshold = (double)q_max+d/2 - d*(double)M/(double)A;
       rMuArray[i+j*RAW_DATA_MAX_COLUMN] = threshold;
 
-      unsigned int mu1 = 0;
-      unsigned int mu2 = 0;
+      double mu1 = 0;
+      double mu2 = 0;
+//      bool do_math = true;
       for(unsigned int k=0; k<getNparameters(); ++k){
-        if((double) k*d < threshold)
-          mu1 += _occupancy[(size_t)i + (size_t)j * (size_t)RAW_DATA_MAX_COLUMN  + (size_t)k * (size_t)RAW_DATA_MAX_COLUMN * (size_t)RAW_DATA_MAX_ROW];
-        else
-          mu2 += (A-_occupancy[(size_t)i + (size_t)j * (size_t)RAW_DATA_MAX_COLUMN  + (size_t)k * (size_t)RAW_DATA_MAX_COLUMN * (size_t)RAW_DATA_MAX_ROW]);
+        if(((double)k*d+(double)q_min) < threshold){
+          mu1 += (double)_occupancy[(size_t)i + (size_t)j * (size_t)RAW_DATA_MAX_COLUMN  + (size_t)k * (size_t)RAW_DATA_MAX_COLUMN * (size_t)RAW_DATA_MAX_ROW];
+        }else{
+//          if(do_math){
+//        	double G = 0.5 - (threshold - ((double)k*d+(double)q_min))/d;
+//            mu1 += G*(double)_occupancy[(size_t)i + (size_t)j * (size_t)RAW_DATA_MAX_COLUMN  + (size_t)k * (size_t)RAW_DATA_MAX_COLUMN * (size_t)RAW_DATA_MAX_ROW];
+//            mu2 += (1-G)*((double)A-(double)_occupancy[(size_t)i + (size_t)j * (size_t)RAW_DATA_MAX_COLUMN  + (size_t)k * (size_t)RAW_DATA_MAX_COLUMN * (size_t)RAW_DATA_MAX_ROW]);
+//            do_math = false;
+//          }else{
+            mu2 += ((double)A-(double)_occupancy[(size_t)i + (size_t)j * (size_t)RAW_DATA_MAX_COLUMN  + (size_t)k * (size_t)RAW_DATA_MAX_COLUMN * (size_t)RAW_DATA_MAX_ROW]);
+//          }
+        }
       }
-      double noise = (double)d*(double)(mu1+mu2)/(double)A*sqrt(3.141592653589893238462643383/2);
+      double noise = d*(mu1+mu2)/(double)A*sqrt(3.14159265358979323846/2);
       rSigmaArray[i+j*RAW_DATA_MAX_COLUMN] = noise;
     }
   }
