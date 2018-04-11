@@ -45,8 +45,8 @@ f = open('VERSION', 'r')
 version = f.readline().strip()
 f.close()
 
-author = 'David-Leon Pohl'
-author_email = 'pohl@physik.uni-bonn.de'
+author = 'Jens Janssen, David-Leon Pohl'
+author_email = 'janssen@physik.uni-bonn.de, pohl@physik.uni-bonn.de'
 
 # Requirements from requirements.txt
 with open('requirements.txt') as f:
