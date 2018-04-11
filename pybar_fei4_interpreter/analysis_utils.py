@@ -1,8 +1,9 @@
 """This class provides often needed analysis functions that had to be speed up using C++.
 """
 
-import numpy as np
 import logging
+
+import numpy as np
 from tables import dtype_from_descr
 
 from pybar_fei4_interpreter import analysis_functions

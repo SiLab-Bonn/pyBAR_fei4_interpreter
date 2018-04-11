@@ -1,6 +1,5 @@
-import tables as tb
-#from tables import descr_from_dtype
 import numpy as np
+import tables as tb
 
 
 class MetaTable(tb.IsDescription):
@@ -8,7 +7,7 @@ class MetaTable(tb.IsDescription):
     stop_index = tb.UInt32Col(pos=1)
     length = tb.UInt32Col(pos=2)
     # https://github.com/PyTables/PyTables/issues/230
-    #timestamp = tb.Time64Col(pos=3)
+#    timestamp = tb.Time64Col(pos=3)
     timestamp = tb.Float64Col(pos=3)
     error = tb.UInt32Col(pos=4)
 
@@ -18,7 +17,7 @@ class MetaTableV2(tb.IsDescription):
     index_stop = tb.UInt32Col(pos=1)
     data_length = tb.UInt32Col(pos=2)
     # https://github.com/PyTables/PyTables/issues/230
-    #timestamp = tb.Time64Col(pos=3)
+#    timestamp = tb.Time64Col(pos=3)
     timestamp_start = tb.Float64Col(pos=3)
     timestamp_stop = tb.Float64Col(pos=4)
     error = tb.UInt32Col(pos=5)
