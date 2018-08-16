@@ -200,10 +200,10 @@ bool Interpret::interpretRawData(unsigned int* pDataWords, const unsigned int& p
 					warning("interpretRawData: Trigger Number not increasing by 1 (old/new): " + IntToStr(_lastTriggerNumber) + "/" + IntToStr(tTriggerNumber) + " at event " + LongIntToStr(_nEvents));
 			}
 
-			if (tTriggerWord == 1) // event trigger number is trigger number of first trigger word within the event
+			if (tTriggerWord == 1) { // event trigger number is trigger number of first trigger word within the event
 				tEventTriggerNumber = tTriggerNumber;
 				tEventTriggerTimeStamp = tTriggerTimeStamp;
-
+			}
 			// store for next event in case of missing trigger word
 			_lastTriggerNumber = tTriggerNumber;
 			_lastTriggerTimeStamp = tTriggerTimeStamp;
