@@ -219,7 +219,7 @@ private:
 	unsigned int* _triggerErrorCounter;      //trigger error histogram
 	unsigned int* _errorCounter;             //error code histogram
 	unsigned int* _tdcCounter;             	 //TDC counter value histogram
-	unsigned int* _tdcTriggerDistance;       //TDC counter value histogram
+	unsigned int* _tdcTriggerDistance;       //TDC distance value histogram
 	unsigned int* _serviceRecordCounter;     //SR histogram
 
 	// temporary variables set according to the actual SRAM word
