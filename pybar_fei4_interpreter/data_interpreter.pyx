@@ -43,7 +43,7 @@ cdef extern from "Interpret.h":
 
         void setMetaData(MetaInfo*& rMetaInfo, const unsigned int& tLength) except +
         void setMetaDataV2(MetaInfoV2*& rMetaInfo, const unsigned int& tLength) except +
- 
+
         void setMetaDataEventIndex(uint64_t*& rEventNumber, const unsigned int& rSize)
         void setMetaDataWordIndex(MetaWordInfoOut*& rWordNumber, const unsigned int& rSize)
 
@@ -92,7 +92,7 @@ cdef data_to_numpy_array_uint32(cnp.uint32_t* ptr, cnp.npy_intp N):
     cdef cnp.ndarray[cnp.uint32_t, ndim=1] arr = cnp.PyArray_SimpleNewFromData(1, <cnp.npy_intp*> &N, cnp.NPY_UINT32, <cnp.uint32_t*> ptr)
     #PyArray_ENABLEFLAGS(arr, np.NPY_OWNDATA)
     return arr
-cdef hit_dt = cnp.dtype([('event_number', '<i8'), ('trigger_number', '<u4'), ('trigger_time_stamp', '<u4'), ('relative_BCID', '<u1'), ('LVL1ID', '<u2'), ('column', '<u1'), ('row', '<u2'), ('tot', '<u1'), ('BCID', '<u2'), ('TDC', '<u2'), ('TDC_time_stamp', '<u1'), ('trigger_status', '<u1'), ('service_record', '<u4'), ('event_status', '<u2')])
+cdef hit_dt = cnp.dtype([('event_number', '<i8'), ('trigger_number', '<u4'), ('trigger_time_stamp', '<u4'), ('relative_BCID', '<u1'), ('LVL1ID', '<u2'), ('column', '<u1'), ('row', '<u2'), ('tot', '<u1'), ('BCID', '<u2'), ('TDC', '<u2'), ('TDC_time_stamp', '<u2'), ('trigger_status', '<u1'), ('service_record', '<u4'), ('event_status', '<u2')])
 cdef hit_data_to_numpy_array(void* ptr, cnp.npy_intp N):
     cdef cnp.ndarray[numpy_hit_info, ndim=1] arr = cnp.PyArray_SimpleNewFromData(1, <cnp.npy_intp*> &N, cnp.NPY_INT8, <void*> ptr).view(hit_dt)
     arr.setflags(write=False)  # protect the hit data
@@ -135,9 +135,9 @@ cdef class PyDataInterpreter:
 #         elif meta_data_dtype == np.dtype([('index_start', '<u4'), ('index_stop', '<u4'), ('data_length', '<u4'), ('timestamp_start', '<f8'), ('timestamp_stop', '<f8'), ('error', '<u4')]):
 #             self.thisptr.setMetaDataV2(<MetaInfoV2*&> meta_data.data, <const unsigned int&> meta_data.shape[0])
         else:
-            raise NotImplementedError('Unknown meta data type %s' % meta_data_dtype) 
+            raise NotImplementedError('Unknown meta data type %s' % meta_data_dtype)
     def set_meta_event_data(self, cnp.ndarray[cnp.uint64_t, ndim=1] meta_data_event_index):
-        self.thisptr.setMetaDataEventIndex(<uint64_t*&> meta_data_event_index.data, <const unsigned int&> meta_data_event_index.shape[0])   
+        self.thisptr.setMetaDataEventIndex(<uint64_t*&> meta_data_event_index.data, <const unsigned int&> meta_data_event_index.shape[0])
     def set_meta_data_word_index(self, cnp.ndarray[numpy_meta_word_data, ndim=1] meta_word_data):
         self.thisptr.setMetaDataWordIndex(<MetaWordInfoOut*&> meta_word_data.data, <const unsigned int&>  meta_word_data.shape[0])
     def get_service_records_counters(self):

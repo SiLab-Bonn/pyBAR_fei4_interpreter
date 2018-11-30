@@ -868,10 +868,12 @@ void Interpret::addEvent()
 void Interpret::storeEventHits()
 {
 	for (unsigned int i = 0; i < tHitBufferIndex; ++i) {
-		// duplicate trigger number and time stamp for event that have missing trigger data word
-		// usually not needed if trigger data word is at the beginning
+		// duplicate certain values for all hits in an event
 		_hitBuffer[i].trigger_number = tEventTriggerNumber;
 		_hitBuffer[i].trigger_time_stamp = tEventTriggerTimeStamp;
+		_hitBuffer[i].TDC = tTdcCount;
+		_hitBuffer[i].TDC_time_stamp = tTdcTimeStamp;
+		_hitBuffer[i].service_record = tServiceRecord;
 		// set status bits at the very end
 		_hitBuffer[i].trigger_status = tTriggerError;
 		_hitBuffer[i].event_status = tErrorCode;

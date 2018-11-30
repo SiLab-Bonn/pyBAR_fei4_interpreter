@@ -98,7 +98,7 @@ class TestAnalysis(unittest.TestCase):
             del interpreter
             del histogram
 
-    def test_data_alignement(self):  # Test if the data alignment is correct (important to detect 32/64 bit related issues)
+    def test_data_alignement(self):  # Test if the data alignment is correct (important to detect data alignment issues)
         hits = np.empty((1,), dtype=[('event_number', np.uint64),
                                      ('trigger_number', np.uint32),
                                      ('trigger_time_stamp', np.uint32),
@@ -109,7 +109,7 @@ class TestAnalysis(unittest.TestCase):
                                      ('tot', np.uint8),
                                      ('BCID', np.uint16),
                                      ('TDC', np.uint16),
-                                     ('TDC_time_stamp', np.uint8),
+                                     ('TDC_time_stamp', np.uint16),
                                      ('trigger_status', np.uint8),
                                      ('service_record', np.uint32),
                                      ('event_status', np.uint16)
@@ -210,7 +210,7 @@ class TestAnalysis(unittest.TestCase):
             array_fast = analysis_utils.hist_1d_index(x, shape=shape)
         except IndexError:
             exception_ok = True
-        except:  # other exception that should not occur
+        except Exception:  # other exception that should not occur
             pass
         self.assertTrue(exception_ok & np.all(array == array_fast))
 
@@ -225,7 +225,7 @@ class TestAnalysis(unittest.TestCase):
             array_fast = analysis_utils.hist_2d_index(x, y, shape=shape)
         except IndexError:
             exception_ok = True
-        except:  # other exception that should not occur
+        except Exception:  # other exception that should not occur
             pass
         self.assertTrue(exception_ok & np.all(array == array_fast))
 
@@ -242,9 +242,10 @@ class TestAnalysis(unittest.TestCase):
                 array_fast = analysis_utils.hist_3d_index(x, y, z, shape=shape)
             except IndexError:
                 exception_ok = True
-            except:  # other exception that should not occur
+            except Exception:  # other exception that should not occur
                 pass
             self.assertTrue(exception_ok & np.all(array == array_fast))
+
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestAnalysis)

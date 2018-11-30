@@ -136,13 +136,13 @@ private:
 	void printErrorCode(const unsigned short& pErrorCode);
 
 	// array variables for interpreted information
-	unsigned int _hitInfoSize;				  //size of the _hitInfo array
-	unsigned int _hitIndex;                   //max index of _hitInfo filled
-	HitInfo* _hitInfo;                        //holds the actual interpreted hits
+	unsigned int _hitInfoSize;					//size of the _hitInfo array
+	unsigned int _hitIndex;						//max index of _hitInfo filled
+	HitInfo* _hitInfo;							//holds the actual interpreted hits
 
 	// array variables for the hit events buffer
-	unsigned int tHitBufferIndex;             //index for the buffer hit info array
-	HitInfo* _hitBuffer;                      //holds the actual interpreted hits of one event, needed to be able to set event error codes subsequently
+	unsigned int tHitBufferIndex;				//index for the buffer hit info array
+	HitInfo* _hitBuffer;						//holds the actual interpreted hits of one event, needed to be able to set event error codes subsequently
 
 	// config variables
 	unsigned int _NbCID; 						//number of BCIDs for one trigger
@@ -177,7 +177,7 @@ private:
 	unsigned int _lastTriggerTimeStamp;         //trigger time stamp of last event
 	unsigned int _startWordIndex;				//the absolute word index of the first word of the actual event
 	unsigned short tTdcCount;					//the TDC count value of the actual event, if no TDC word occurred this value is zero
-	unsigned char tTdcTimeStamp;				//the TDC time stamp of the actual event, if no TDC word occurred this value is zero
+	unsigned short tTdcTimeStamp;				//the TDC time stamp / distance of the actual event, if no TDC word occurred this value is zero
 
 	// counters/flags for the total raw data processing
 	unsigned int _nTriggers;					//total number of trigger words found

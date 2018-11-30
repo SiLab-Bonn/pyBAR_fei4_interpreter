@@ -14,42 +14,42 @@
 
 //structure to store the hits
 typedef struct HitInfo{
-	int64_t event_number;			//event number value (unsigned long long: 0 to 18,446,744,073,709,551,615)
-	unsigned int trigger_number;	//trigger number
-	unsigned int trigger_time_stamp;//trigger time stamp
-	unsigned char relative_BCID;	//relative BCID value (unsigned char: 0 to 255)
-	unsigned short int LVL1ID;		//LVL1ID (unsigned short int: 0 to 65.535)
-	unsigned char column;			//column value (unsigned char: 0 to 255)
-	unsigned short int row;			//row value (unsigned short int: 0 to 65.535)
-	unsigned char tot;				//tot value (unsigned char: 0 to 255)
-	unsigned short int BCID;		//absolute BCID value (unsigned short int: 0 to 65.535)
-	unsigned short int TDC;			//the TDC value (12-bit value)
-	unsigned char TDC_time_stamp;	//a TDC time stamp value (8-bit value), either trigger distance (640 MHz) or time stamp (40 MHz)
-	unsigned char trigger_status;	//event service records
-	unsigned int service_record;	//event service records
-	unsigned short int event_status;//event status value (unsigned short int: 0 to 65.535)
+	int64_t event_number;				//event number value (unsigned long long: 0 to 18,446,744,073,709,551,615)
+	unsigned int trigger_number;		//trigger number
+	unsigned int trigger_time_stamp;	//trigger time stamp
+	unsigned char relative_BCID;		//relative BCID value (unsigned char: 0 to 255)
+	unsigned short int LVL1ID;			//LVL1ID (unsigned short int: 0 to 65.535)
+	unsigned char column;				//column value (unsigned char: 0 to 255)
+	unsigned short int row;				//row value (unsigned short int: 0 to 65.535)
+	unsigned char tot;					//tot value (unsigned char: 0 to 255)
+	unsigned short int BCID;			//absolute BCID value (unsigned short int: 0 to 65.535)
+	unsigned short int TDC;				//TDC value (12-bit value)
+	unsigned short int TDC_time_stamp;	//TDC time stamp / distance value (16-bit value)
+	unsigned char trigger_status;		//event service records
+	unsigned int service_record;		//event service records
+	unsigned short int event_status;	//event status value (unsigned short int: 0 to 65.535)
 } HitInfo;
 
 //structure to store the hits with cluster info
 typedef struct ClusterHitInfo{
-	int64_t event_number;			//event number value (unsigned long long: 0 to 18,446,744,073,709,551,615)
-	unsigned int trigger_number;	//trigger number
-	unsigned int trigger_time_stamp;//trigger time stamp
-	unsigned char relative_BCID;	//relative BCID value (unsigned char: 0 to 255)
-	unsigned short int LVL1ID;		//LVL1ID (unsigned short int: 0 to 65.535)
-	unsigned char column;			//column value (unsigned char: 0 to 255)
-	unsigned short int row;			//row value (unsigned short int: 0 to 65.535)
-	unsigned char tot;				//tot value (unsigned char: 0 to 255)
-	unsigned short int BCID;		//absolute BCID value (unsigned short int: 0 to 65.535)
-	unsigned short int TDC;			//the TDC value (12-bit value)
-	unsigned char TDC_time_stamp;	//a TDC time stamp value (8-bit value), either trigger distance (640 MHz) or time stamp (40 MHz)
-	unsigned char trigger_status;	//event service records
-	unsigned int service_record;	//event service records
-	unsigned short int event_status;//event status value (unsigned short int: 0 to 65.535)
-	unsigned short cluster_id;		//the cluster id of the hit
-	unsigned char is_seed;			//flag to mark seed pixel
-	unsigned short cluster_size;	//the cluster size of the cluster belonging to the hit
-	unsigned short n_cluster;		//the number of cluster in the event
+	int64_t event_number;				//event number value (unsigned long long: 0 to 18,446,744,073,709,551,615)
+	unsigned int trigger_number;		//trigger number
+	unsigned int trigger_time_stamp;	//trigger time stamp
+	unsigned char relative_BCID;		//relative BCID value (unsigned char: 0 to 255)
+	unsigned short int LVL1ID;			//LVL1ID (unsigned short int: 0 to 65.535)
+	unsigned char column;				//column value (unsigned char: 0 to 255)
+	unsigned short int row;				//row value (unsigned short int: 0 to 65.535)
+	unsigned char tot;					//tot value (unsigned char: 0 to 255)
+	unsigned short int BCID;			//absolute BCID value (unsigned short int: 0 to 65.535)
+	unsigned short int TDC;				//TDC value (12-bit value)
+	unsigned short int TDC_time_stamp;	//TDC time stamp / distance value (16-bit value)
+	unsigned char trigger_status;		//event service records
+	unsigned int service_record;		//event service records
+	unsigned short int event_status;	//event status value (unsigned short int: 0 to 65.535)
+	unsigned short cluster_id;			//the cluster id of the hit
+	unsigned char is_seed;				//flag to mark seed pixel
+	unsigned short cluster_size;		//the cluster size of the cluster belonging to the hit
+	unsigned short n_cluster;			//the number of cluster in the event
 } ClusterHitInfo;
 
 //structure to store the cluster
@@ -166,9 +166,9 @@ const unsigned int RAW_DATA_MAX_ROW=336;
 #define __N_TDC_DIST_VALUES 256
 #define TDC_HEADER 0x40000000 // 0100 xxxx xxxx xxxx xxxx xxxx xxxx xxxx, x may contain user data
 #define TDC_HEADER_MASK 0xF0000000 // select TDC header, no one-hot header
-#define TDC_COUNT_MASK 0x00000FFF
-#define TDC_TIME_STAMP_MASK 0x0FFFF000  // time stamp (running counter) to compare e.g. with trigger time stamp or TDC word counter, 16 bit, 8 bit if the TDC distribution macro is activated
-#define TDC_TRIG_DIST_MASK 0x0FF00000  // delay between trigger and TDC leading edge
+#define TDC_COUNT_MASK 0x00000FFF // TDC value, 12bit
+#define TDC_TIME_STAMP_MASK 0x0FFFF000 // TDC time stamp (or running counter) / distance, 16bit
+#define TDC_TRIG_DIST_MASK 0x0FF00000 // TDC distance, delay between TDC trigger and TDC leading edge, 8bit
 #define TDC_WORD_MACRO(X) (((TDC_HEADER_MASK & X) == TDC_HEADER) ? true : false)
 #define TDC_COUNT_MACRO(X) (TDC_COUNT_MASK & X)
 #define TDC_TIME_STAMP_MACRO(X) ((TDC_TIME_STAMP_MASK & X) >> 12)
@@ -186,9 +186,9 @@ const unsigned int RAW_DATA_MAX_ROW=336;
 #define DATA_HEADER_MASK				0xF0FF0000
 #define DATA_HEADER_FLAG_MASK			0x00008000
 #define DATA_HEADER_LV1ID_MASK			0x00007F00
-#define DATA_HEADER_LV1ID_MASK_FEI4B	0x00007C00	// data format changed in fE-I4B. Upper LV1IDs comming in seperate SR.
+#define DATA_HEADER_LV1ID_MASK_FEI4B	0x00007C00 // data format changed in fE-I4B. Upper LV1IDs comming in seperate SR.
 #define DATA_HEADER_BCID_MASK			0x000000FF
-#define DATA_HEADER_BCID_MASK_FEI4B		0x000003FF  // data format changed in FE-I4B due to increased counter size, See DATA_HEADER_LV1ID_MASK_FEI4B also.
+#define DATA_HEADER_BCID_MASK_FEI4B		0x000003FF // data format changed in FE-I4B due to increased counter size, See DATA_HEADER_LV1ID_MASK_FEI4B also.
 
 #define DATA_HEADER_MACRO(X)			((DATA_HEADER_MASK & X) == DATA_HEADER ? true : false)
 #define DATA_HEADER_FLAG_MACRO(X)		((DATA_HEADER_FLAG_MASK & X) >> 15)

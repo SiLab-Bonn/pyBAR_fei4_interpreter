@@ -34,8 +34,8 @@ cdef packed struct numpy_hit_info:
     cnp.uint16_t row  # row value (unsigned short int: 0 to 65.535)
     cnp.uint8_t tot  # ToT value (unsigned char: 0 to 255)
     cnp.uint16_t BCID  # absolute BCID value (unsigned short int: 0 to 65.535)
-    cnp.uint16_t TDC  # absolute BCID value (unsigned short int: 0 to 65.535)
-    cnp.uint8_t TDC_time_stamp  # a TDC time stamp value (8-bit value), either trigger distance (640 MHz) or time stamp (40 MHz)
+    cnp.uint16_t TDC  # TDC value (12-bit value)
+    cnp.uint16_t TDC_time_stamp  # TDC time stamp / distance value (16-bit value)
     cnp.uint8_t trigger_status  # event trigger status
     cnp.uint32_t service_record  # event service records
     cnp.uint16_t event_status  # event status value (unsigned char: 0 to 255)
@@ -50,8 +50,8 @@ cdef packed struct numpy_cluster_hit_info:
     cnp.uint16_t row  # row value (unsigned short int: 0 to 65.535)
     cnp.uint8_t tot  # ToT value (unsigned char: 0 to 255)
     cnp.uint16_t BCID  # absolute BCID value (unsigned short int: 0 to 65.535)
-    cnp.uint16_t TDC  # absolute BCID value (unsigned short int: 0 to 65.535)
-    cnp.uint8_t TDC_time_stamp  # a TDC time stamp value (8-bit value), either trigger distance (640 MHz) or time stamp (40 MHz)
+    cnp.uint16_t TDC  # TDC value (12-bit value)
+    cnp.uint16_t TDC_time_stamp  # TDC time stamp / distance value (16-bit value)
     cnp.uint8_t trigger_status  # event trigger status
     cnp.uint32_t service_record  # event service records
     cnp.uint16_t event_status  # event status value (unsigned char: 0 to 255)
