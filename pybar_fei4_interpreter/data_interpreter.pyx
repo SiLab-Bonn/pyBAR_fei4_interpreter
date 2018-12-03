@@ -1,6 +1,8 @@
 # distutils: language = c++
 # cython: boundscheck=False
 # cython: wraparound=False
+# cython: language_level=2
+
 import numpy as np
 cimport numpy as cnp
 from numpy cimport ndarray

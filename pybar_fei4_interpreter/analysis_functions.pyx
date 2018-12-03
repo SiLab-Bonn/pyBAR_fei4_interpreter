@@ -1,12 +1,11 @@
 # distutils: language = c++
 # cython: boundscheck=False
 # cython: wraparound=False
+# cython: language_level=2
 
 import numpy as np
 cimport numpy as cnp
 from numpy cimport ndarray
-#from libcpp cimport bool  # to be able to use bool variables
-from tables import dtype_from_descr
 from libc.stdint cimport uint8_t, uint16_t, uint32_t, uint64_t, int64_t
 
 from data_struct cimport numpy_cluster_info
@@ -41,18 +40,13 @@ def get_in1d_sorted(cnp.ndarray[cnp.int64_t, ndim=1] array_one, cnp.ndarray[cnp.
     return (array_result == 1)
 
 def hist_1d(cnp.ndarray[cnp.int32_t, ndim=1] x, const unsigned int& n_x, cnp.ndarray[cnp.uint32_t, ndim=1] array_result):
-    histogram_1d(<int*&> x.data, <const unsigned int&> x.shape[0], <const unsigned int&> n_x, <uint32_t*&> array_result.data) 
+    histogram_1d(<int*&> x.data, <const unsigned int&> x.shape[0], <const unsigned int&> n_x, <uint32_t*&> array_result.data)
 
 def hist_2d(cnp.ndarray[cnp.int32_t, ndim=1] x, cnp.ndarray[cnp.int32_t, ndim=1] y, const unsigned int& n_x, const unsigned int& n_y, cnp.ndarray[cnp.uint32_t, ndim=1] array_result):
     histogram_2d(<int*&> x.data, <int*&> y.data, <const unsigned int&> x.shape[0], <const unsigned int&> n_x, <const unsigned int&> n_y, <uint32_t*&> array_result.data)
-    
+
 def hist_3d(cnp.ndarray[cnp.int32_t, ndim=1] x, cnp.ndarray[cnp.int32_t, ndim=1] y, cnp.ndarray[cnp.int32_t, ndim=1] z, const unsigned int& n_x, const unsigned int& n_y, const unsigned int& n_z, cnp.ndarray[cnp.uint32_t, ndim=1] array_result, throw_exception = True):
     histogram_3d(<int*&> x.data, <int*&> y.data, <int*&> z.data, <const unsigned int&> x.shape[0], <const unsigned int&> n_x, <const unsigned int&> n_y, <const unsigned int&> n_z, <uint32_t*&> array_result.data)
-    
-def map_cluster(cnp.ndarray[cnp.int64_t, ndim=1] event_array, cnp.ndarray[numpy_cluster_info, ndim=1] cluster_hit_info, cnp.ndarray[numpy_cluster_info, ndim=1] mapped_cluster_hit_info):    
+
+def map_cluster(cnp.ndarray[cnp.int64_t, ndim=1] event_array, cnp.ndarray[numpy_cluster_info, ndim=1] cluster_hit_info, cnp.ndarray[numpy_cluster_info, ndim=1] mapped_cluster_hit_info):
     mapCluster(<int64_t*&> event_array.data, <const unsigned int&> event_array.shape[0], <ClusterInfo *&> cluster_hit_info.data, <const unsigned int &> cluster_hit_info.shape[0], <ClusterInfo *&> mapped_cluster_hit_info.data, <const unsigned int &> mapped_cluster_hit_info.shape[0])
-    
-    
-    
-    
-    

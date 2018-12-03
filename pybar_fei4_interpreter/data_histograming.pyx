@@ -1,6 +1,8 @@
 # distutils: language = c++
 # cython: boundscheck=False
 # cython: wraparound=False
+# cython: language_level=2
+
 import numpy as np
 cimport numpy as cnp
 from libcpp cimport bool as cpp_bool  # to be able to use bool variables, as cpp_bool according to http://code.google.com/p/cefpython/source/browse/cefpython/cefpython.pyx?spec=svne037c69837fa39ae220806c2faa1bbb6ae4500b9&r=e037c69837fa39ae220806c2faa1bbb6ae4500b9
