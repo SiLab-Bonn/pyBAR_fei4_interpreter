@@ -17,7 +17,6 @@ class MetaTableV2(tb.IsDescription):
     index_stop = tb.UInt32Col(pos=1)
     data_length = tb.UInt32Col(pos=2)
     # https://github.com/PyTables/PyTables/issues/230
-#    timestamp = tb.Time64Col(pos=3)
     timestamp_start = tb.Float64Col(pos=3)
     timestamp_stop = tb.Float64Col(pos=4)
     error = tb.UInt32Col(pos=5)
@@ -77,9 +76,10 @@ class HitInfoTable(tb.IsDescription):
     BCID = tb.UInt16Col(pos=8)
     TDC = tb.UInt16Col(pos=9)
     TDC_time_stamp = tb.UInt16Col(pos=10)
-    trigger_status = tb.UInt8Col(pos=11)
-    service_record = tb.UInt32Col(pos=12)
-    event_status = tb.UInt16Col(pos=13)
+    TDC_trigger_distance = tb.UInt8Col(pos=11)
+    trigger_status = tb.UInt8Col(pos=12)
+    service_record = tb.UInt32Col(pos=13)
+    event_status = tb.UInt16Col(pos=14)
 
 
 class MetaInfoEventTable(tb.IsDescription):
@@ -113,13 +113,14 @@ class ClusterHitInfoTable(tb.IsDescription):
     BCID = tb.UInt16Col(pos=8)
     TDC = tb.UInt16Col(pos=9)
     TDC_time_stamp = tb.UInt16Col(pos=10)
-    trigger_status = tb.UInt8Col(pos=11)
-    service_record = tb.UInt32Col(pos=12)
-    event_status = tb.UInt16Col(pos=13)
-    cluster_id = tb.UInt16Col(pos=14)
-    is_seed = tb.UInt8Col(pos=15)
-    cluster_size = tb.UInt16Col(pos=16)
-    n_cluster = tb.UInt16Col(pos=17)
+    TDC_trigger_distance = tb.UInt8Col(pos=11)
+    trigger_status = tb.UInt8Col(pos=12)
+    service_record = tb.UInt32Col(pos=13)
+    event_status = tb.UInt16Col(pos=14)
+    cluster_id = tb.UInt16Col(pos=15)
+    is_seed = tb.UInt8Col(pos=16)
+    cluster_size = tb.UInt16Col(pos=17)
+    n_cluster = tb.UInt16Col(pos=18)
 
 
 class ClusterInfoTable(tb.IsDescription):

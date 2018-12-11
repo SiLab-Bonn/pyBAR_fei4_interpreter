@@ -23,7 +23,7 @@ cdef extern from "Histogram.h":
     cdef cppclass ClusterInfo:
         ClusterInfo()
     cdef cppclass Histogram(Basis):
-        Histogram() except +
+        Histogram() except +  # exception raised by C++ code handled by Python
         void setErrorOutput(cpp_bool pToggle)
         void setWarningOutput(cpp_bool pToggle)
         void setInfoOutput(cpp_bool pToggle)
@@ -33,7 +33,7 @@ cdef extern from "Histogram.h":
         void createRelBCIDHist(cpp_bool CreateRelBCIDHist)
         void createMeanTotHist(cpp_bool CreateMeanTotHist)
         void createTotHist(cpp_bool CreateTotHist)
-        void createTdcHist(cpp_bool CreateTdcHist)
+        void createTdcValueHist(cpp_bool CreateTdcValueHist)
         void createTdcTriggerDistanceHist(cpp_bool CreateTdcTriggerDistanceHist)
         void createTdcPixelHist(cpp_bool CreateTdcPixelHist)
         void createTotPixelHist(cpp_bool CreateTotPixelHist)
@@ -42,17 +42,17 @@ cdef extern from "Histogram.h":
         void getOccupancy(unsigned int& rNparameterValues, unsigned int*& rOccupancy, cpp_bool copy)  # returns the occupancy histogram for all hits
         void getTotHist(unsigned int*& rTotHist, cpp_bool copy)  # returns the tot histogram for all hits
         void getMeanTot(unsigned int& rNparameterValues, float*& rOccupancy, cpp_bool copy)
-        void getTdcHist(unsigned int*& rTdcHist, cpp_bool copy)
-        void getTdcTriggerDistanceHist(unsigned int*& rTdcTriggerDistanceHist, cpp_bool copy)
+        void getTdcValuesHist(unsigned int*& rTdcValueHist, cpp_bool copy)
+        void getTdcTriggerDistancesHist(unsigned int*& rTdcTriggerDistanceHist, cpp_bool copy)
         void getRelBcidHist(unsigned int*& rRelBcidHist, cpp_bool copy)  # returns the relative BCID histogram for all hits
         void getTdcPixelHist(unsigned short*& rTdcPixelHist, cpp_bool copy)  # returns the tdc pixel histogram for all hits
         void getTotPixelHist(unsigned short*& rTotPixelHist, cpp_bool copy)  # returns the tot pixel histogram for all hits
 
-        void addHits(HitInfo*& rHitInfo, const unsigned int& rNhits) except +
-        void addClusterSeedHits(ClusterInfo*& rClusterInfo, const unsigned int& rNcluster) except +
-        void addScanParameter(int*& rParInfo, const unsigned int& rNparInfoLength) except +
+        void addHits(HitInfo*& rHitInfo, const unsigned int& rNhits) except +  # exception raised by C++ code handled by Python
+        void addClusterSeedHits(ClusterInfo*& rClusterInfo, const unsigned int& rNcluster) except +  # exception raised by C++ code handled by Python
+        void addScanParameter(int*& rParInfo, const unsigned int& rNparInfoLength) except +  # exception raised by C++ code handled by Python
         void setNoScanParameter()
-        void addMetaEventIndex(uint64_t*& rMetaEventIndex, const unsigned int& rNmetaEventIndexLength) except +
+        void addMetaEventIndex(uint64_t*& rMetaEventIndex, const unsigned int& rNmetaEventIndexLength) except +  # exception raised by C++ code handled by Python
 
         unsigned int getMinParameter()  # returns the minimum parameter from _parInfo
         unsigned int getMaxParameter()  # returns the maximum parameter from _parInfo
@@ -60,8 +60,7 @@ cdef extern from "Histogram.h":
 
         void calculateThresholdScanArrays(double rMuArray[], double rSigmaArray[], const unsigned int& rMaxInjections, const unsigned int& min_parameter, const unsigned int& max_parameter)  # takes the occupancy histograms for different parameters for the threshold arrays
 
-        void reset() except +
-        void test()
+        void reset() except +  # exception raised by C++ code handled by Python
 
 cdef data_to_numpy_array_uint16(cnp.uint16_t* ptr, cnp.npy_intp N):
     cdef cnp.ndarray[cnp.uint16_t, ndim=1] arr = cnp.PyArray_SimpleNewFromData(1, <cnp.npy_intp*> &N, cnp.NPY_UINT16, <cnp.uint16_t*> ptr)
@@ -105,9 +104,9 @@ cdef class PyDataHistograming:
         self.thisptr.createTotHist(<cpp_bool> toggle)
     def create_mean_tot_hist(self,toggle):
         self.thisptr.createMeanTotHist(<cpp_bool> toggle)
-    def create_tdc_hist(self,toggle):
-        self.thisptr.createTdcHist(<cpp_bool> toggle)
-    def create_tdc_distance_hist(self,toggle):
+    def create_tdc_value_hist(self,toggle):
+        self.thisptr.createTdcValueHist(<cpp_bool> toggle)
+    def create_tdc_trigger_distance_hist(self,toggle):
         self.thisptr.createTdcTriggerDistanceHist(<cpp_bool> toggle)
     def create_tdc_pixel_hist(self,toggle):
         self.thisptr.createTdcPixelHist(<cpp_bool> toggle)
@@ -129,12 +128,12 @@ cdef class PyDataHistograming:
         if data_float != NULL:
             array = data_to_numpy_array_float(data_float, 80 * 336 * Nparameter)
             return array.reshape((80, 336, Nparameter), order='F')  # make linear array to 3d array (col,row,parameter)
-    def get_tdc_hist(self):
-        self.thisptr.getTdcHist(<unsigned int*&> data_32, <cpp_bool> False)
+    def get_tdc_value_hist(self):
+        self.thisptr.getTdcValuesHist(<unsigned int*&> data_32, <cpp_bool> False)
         if data_32 != NULL:
             return data_to_numpy_array_uint32(data_32, 4096)
-    def get_tdc_distance_hist(self):
-        self.thisptr.getTdcTriggerDistanceHist(<unsigned int*&> data_32, <cpp_bool> False)
+    def get_tdc_trigger_distance_hist(self):
+        self.thisptr.getTdcTriggerDistancesHist(<unsigned int*&> data_32, <cpp_bool> False)
         if data_32 != NULL:
             return data_to_numpy_array_uint32(data_32, 256)
     def get_rel_bcid_hist(self):
@@ -167,5 +166,3 @@ cdef class PyDataHistograming:
         self.thisptr.calculateThresholdScanArrays(<double*> threshold.data, <double*> noise.data, <const unsigned int&> n_injections, <const unsigned int&> min_parameter, <const unsigned int&> max_parameter)
     def reset(self):
         self.thisptr.reset()
-    def test(self):
-        self.thisptr.test()

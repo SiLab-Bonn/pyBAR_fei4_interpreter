@@ -28,7 +28,7 @@ cdef extern from "Interpret.h":
     cdef cppclass HitInfo:
         HitInfo()
     cdef cppclass Interpret(Basis):
-        Interpret() except +
+        Interpret() except +  # exception raised by C++ code handled by Python
         void printStatus()
         void setErrorOutput(cpp_bool pToggle)
         void setWarningOutput(cpp_bool pToggle)
@@ -43,21 +43,21 @@ cdef extern from "Interpret.h":
 
         void setHitsArraySize(const unsigned int &rSize)
 
-        void setMetaData(MetaInfo*& rMetaInfo, const unsigned int& tLength) except +
-        void setMetaDataV2(MetaInfoV2*& rMetaInfo, const unsigned int& tLength) except +
+        void setMetaData(MetaInfo*& rMetaInfo, const unsigned int& tLength) except +  # exception raised by C++ code handled by Python
+        void setMetaDataV2(MetaInfoV2*& rMetaInfo, const unsigned int& tLength) except +  # exception raised by C++ code handled by Python
 
         void setMetaDataEventIndex(uint64_t*& rEventNumber, const unsigned int& rSize)
         void setMetaDataWordIndex(MetaWordInfoOut*& rWordNumber, const unsigned int& rSize)
 
-        void interpretRawData(unsigned int* pDataWords, const unsigned int& pNdataWords) except +
+        void interpretRawData(unsigned int* pDataWords, const unsigned int& pNdataWords) except +  # exception raised by C++ code handled by Python
 #         void getMetaEventIndex(unsigned int& rEventNumberIndex, unsigned int*& rEventNumber)
         void getHits(HitInfo*& rHitInfo, unsigned int& rSize, cpp_bool copy)
 
         void getServiceRecordsCounters(unsigned int*& rServiceRecordsCounter, unsigned int& rNserviceRecords, cpp_bool copy)  # returns the total service record counter array
-        void getErrorCounters(unsigned int*& rErrorCounter, unsigned int& rNerrorCounters, cpp_bool copy)  # returns the total errors counter array
-        void getTriggerErrorCounters(unsigned int*& rTriggerErrorCounter, unsigned int& rNTriggerErrorCounters, cpp_bool copy)  # returns the total trigger errors counter array
-        void getTdcCounters(unsigned int*& rTdcCounter, unsigned int& rNtdcCounters, cpp_bool copy)
-        void getTdcTriggerDistance(unsigned int*& rTdcTriggerDistance, unsigned int& rNtdcTriggerDistance, cpp_bool copy)
+        void getEventStatusCounters(unsigned int*& rEventStatusCounter, unsigned int& rNeventStatusCounters, cpp_bool copy)  # returns the total errors counter array
+        void getTriggerStatusCounters(unsigned int*& rTriggerStatusCounter, unsigned int& rNTriggerStatusCounters, cpp_bool copy)  # returns the total trigger errors counter array
+        void getTdcValues(unsigned int*& rTdcValue, unsigned int& rNtdcValues, cpp_bool copy)
+        void getTdcTriggerDistances(unsigned int*& rTdcTriggerDistance, unsigned int& rNtdcTriggerDistance, cpp_bool copy)
         unsigned int getNarrayHits()  # returns the maximum index filled with hits in the hit array
         unsigned int getNmetaDataEvent()  # returns the maximum index filled with event data infos
         unsigned int getNmetaDataWord()
@@ -65,7 +65,8 @@ cdef extern from "Interpret.h":
         void alignAtTdcWord(cpp_bool alignAtTdcWord)
         void setTriggerDataFormat(const unsigned int& rTriggerDataFormat)
         void setMaxTdcDelay(const unsigned int& rMaxTdcDelay)
-        void useTdcTriggerTimeStamp(cpp_bool useTdcTriggerTimeStamp)
+        void setTdcTriggerTimeStamp(cpp_bool haveTdcTriggerTimeStamp)
+        void setTdcTriggerDistance(cpp_bool haveTdcTriggerDistance)
         void setMaxTriggerNumber(const unsigned int& rMaxTriggerNumber)
 
         void resetEventVariables()
@@ -94,7 +95,22 @@ cdef data_to_numpy_array_uint32(cnp.uint32_t* ptr, cnp.npy_intp N):
     cdef cnp.ndarray[cnp.uint32_t, ndim=1] arr = cnp.PyArray_SimpleNewFromData(1, <cnp.npy_intp*> &N, cnp.NPY_UINT32, <cnp.uint32_t*> ptr)
     #PyArray_ENABLEFLAGS(arr, np.NPY_OWNDATA)
     return arr
-cdef hit_dt = cnp.dtype([('event_number', '<i8'), ('trigger_number', '<u4'), ('trigger_time_stamp', '<u4'), ('relative_BCID', '<u1'), ('LVL1ID', '<u2'), ('column', '<u1'), ('row', '<u2'), ('tot', '<u1'), ('BCID', '<u2'), ('TDC', '<u2'), ('TDC_time_stamp', '<u2'), ('trigger_status', '<u1'), ('service_record', '<u4'), ('event_status', '<u2')])
+cdef hit_dt = cnp.dtype([
+    ('event_number', '<i8'),
+    ('trigger_number', '<u4'),
+    ('trigger_time_stamp', '<u4'),
+    ('relative_BCID', '<u1'),
+    ('LVL1ID', '<u2'),
+    ('column', '<u1'),
+    ('row', '<u2'),
+    ('tot', '<u1'),
+    ('BCID', '<u2'),
+    ('TDC', '<u2'),
+    ('TDC_time_stamp', '<u2'),
+    ('TDC_trigger_distance', '<u1'),
+    ('trigger_status', '<u1'),
+    ('service_record', '<u4'),
+    ('event_status', '<u2')])
 cdef hit_data_to_numpy_array(void* ptr, cnp.npy_intp N):
     cdef cnp.ndarray[numpy_hit_info, ndim=1] arr = cnp.PyArray_SimpleNewFromData(1, <cnp.npy_intp*> &N, cnp.NPY_INT8, <void*> ptr).view(hit_dt)
     arr.setflags(write=False)  # protect the hit data
@@ -132,10 +148,6 @@ cdef class PyDataInterpreter:
             self.thisptr.setMetaData(<MetaInfo*&> meta_data.data, <const unsigned int&> meta_data.shape[0])
         elif meta_data_dtype == dtype_from_descr(MetaTableV2):
             self.thisptr.setMetaDataV2(<MetaInfoV2*&> meta_data.data, <const unsigned int&> meta_data.shape[0])
-#         if meta_data_dtype == np.dtype([('start_index', '<u4'), ('stop_index', '<u4'), ('length', '<u4'), ('timestamp', '<f8'), ('error', '<u4')]):
-#             self.thisptr.setMetaData(<MetaInfo*&> meta_data.data, <const unsigned int&> meta_data.shape[0])
-#         elif meta_data_dtype == np.dtype([('index_start', '<u4'), ('index_stop', '<u4'), ('data_length', '<u4'), ('timestamp_start', '<f8'), ('timestamp_stop', '<f8'), ('error', '<u4')]):
-#             self.thisptr.setMetaDataV2(<MetaInfoV2*&> meta_data.data, <const unsigned int&> meta_data.shape[0])
         else:
             raise NotImplementedError('Unknown meta data type %s' % meta_data_dtype)
     def set_meta_event_data(self, cnp.ndarray[cnp.uint64_t, ndim=1] meta_data_event_index):
@@ -146,34 +158,36 @@ cdef class PyDataInterpreter:
         self.thisptr.getServiceRecordsCounters(<unsigned int*&> data_32, <unsigned int&> n_entries, <cpp_bool> False)
         if data_32 != NULL:
             return data_to_numpy_array_uint32(data_32, n_entries)
-    def get_error_counters(self):
-        self.thisptr.getErrorCounters(<unsigned int*&> data_32, <unsigned int&> n_entries, <cpp_bool> False)
+    def get_event_status_counters(self):
+        self.thisptr.getEventStatusCounters(<unsigned int*&> data_32, <unsigned int&> n_entries, <cpp_bool> False)
         if data_32 != NULL:
             return data_to_numpy_array_uint32(data_32, n_entries)
-    def get_trigger_error_counters(self):
-        self.thisptr.getTriggerErrorCounters(<unsigned int*&> data_32, <unsigned int&> n_entries, <cpp_bool> False)
+    def get_trigger_status_counters(self):
+        self.thisptr.getTriggerStatusCounters(<unsigned int*&> data_32, <unsigned int&> n_entries, <cpp_bool> False)
         if data_32 != NULL:
             return data_to_numpy_array_uint32(data_32, n_entries)
-    def get_tdc_counters(self):
-        self.thisptr.getTdcCounters(<unsigned int*&> data_32, <unsigned int&> n_entries, <cpp_bool> False)
+    def get_tdc_values(self):
+        self.thisptr.getTdcValues(<unsigned int*&> data_32, <unsigned int&> n_entries, <cpp_bool> False)
         if data_32 != NULL:
             return data_to_numpy_array_uint32(data_32, n_entries)
-    def get_tdc_distance(self):
-        self.thisptr.getTdcTriggerDistance(<unsigned int*&> data_32, <unsigned int&> n_entries, <cpp_bool> False)
+    def get_tdc_trigger_distances(self):
+        self.thisptr.getTdcTriggerDistances(<unsigned int*&> data_32, <unsigned int&> n_entries, <cpp_bool> False)
         if data_32 != NULL:
             return data_to_numpy_array_uint32(data_32, n_entries)
     def get_n_array_hits(self):
         return <unsigned int> self.thisptr.getNarrayHits()
     def get_n_meta_data_word(self):
         return <unsigned int> self.thisptr.getNmetaDataWord()
-    def align_at_trigger(self, use_trigger_number):
-        self.thisptr.alignAtTriggerNumber(<cpp_bool> use_trigger_number)
-    def align_at_tdc(self, use_tdc_word):
-        self.thisptr.alignAtTdcWord(<cpp_bool> use_tdc_word)
+    def align_at_trigger(self, align_at_trigger):
+        self.thisptr.alignAtTriggerNumber(<cpp_bool> align_at_trigger)
+    def align_at_tdc(self, align_at_tdc):
+        self.thisptr.alignAtTdcWord(<cpp_bool> align_at_tdc)
     def set_trigger_data_format(self, trigger_data_format):
         self.thisptr.setTriggerDataFormat(<const unsigned int&> trigger_data_format)
-    def use_tdc_trigger_time_stamp(self, use_tdc_trigger_time_stamp):
-        self.thisptr.useTdcTriggerTimeStamp(<cpp_bool> use_tdc_trigger_time_stamp)
+    def set_tdc_trigger_time_stamp(self, have_tdc_trigger_time_stamp):
+        self.thisptr.setTdcTriggerTimeStamp(<cpp_bool> have_tdc_trigger_time_stamp)
+    def set_tdc_trigger_distance(self, have_tdc_trigger_distance):
+        self.thisptr.setTdcTriggerDistance(<cpp_bool> have_tdc_trigger_distance)
     def get_n_meta_data_event(self):
         return <unsigned int> self.thisptr.getNmetaDataEvent()
 #     def get_meta_event_index(self, cnp.ndarray[cnp.uint32_t, ndim=1] event_index):
