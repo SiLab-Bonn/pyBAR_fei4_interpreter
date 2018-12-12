@@ -652,10 +652,17 @@ void Interpret::printSummary()
   std::cout << "1 " << std::right << std::setw(15) << _triggerStatusCounter[1] << " # Trigger per event > 1\n\n";
 
   std::cout << "# Service Records\n";
+  bool no_service_record = true;
   for (unsigned int i = 0; i < __NSERVICERECORDS; ++i) {
     if (_serviceRecordCounter[i] > 0) {
+      no_service_record = false;
       std::cout << std::left << std::setw(2) << i << std::right << std::setw(15) << _serviceRecordCounter[i] << "\n";
     }
+  }
+  if (no_service_record) {
+    std::cout << "NO SERVICE RECORD" << "\n\n";
+  } else {
+    std::cout << "\n";
   }
 }
 
