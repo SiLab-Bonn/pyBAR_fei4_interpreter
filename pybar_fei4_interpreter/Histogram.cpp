@@ -191,7 +191,7 @@ void Histogram::addHits(HitInfo*& rHitInfo, const unsigned int& rNhits)
     if (_createTotHist)
       if (tTot <= __MAXHITTOT)
         _tot[tTot] += 1;
-    if ((rHitInfo[i].event_status & (__NO_HIT | __MORE_THAN_ONE_HIT | __MORE_THAN_ONE_TDC_WORD)) == 0) {  // get TDC values from single hit events and unambiguous TDC word
+    if (((rHitInfo[i].event_status & (__NO_HIT | __MORE_THAN_ONE_HIT | __MORE_THAN_ONE_TDC_WORD | __TDC_INVALID)) == 0) && ((rHitInfo[i].event_status & __TDC_WORD) == __TDC_WORD)) {  // get TDC values from single hit events and unambiguous TDC word
       if (_createTdcValueHist) {  // get TDC values from single hit events
         _tdcValue[tTdc] += 1;
       }
