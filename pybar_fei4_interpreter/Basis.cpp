@@ -10,7 +10,7 @@ Basis::Basis(void)
   _bugReportFileName = "BugReport";
 }
 
-Basis::~Basis(void)
+Basis::~Basis()
 {
   ;
 }

@@ -29,7 +29,7 @@ class Basis
 {
 public:
   Basis(void);
-  ~Basis(void);
+  virtual ~Basis()=0;
 
   void setSourceFileName(std::string pSourceFileName);  // sets the name of every raw data converter class for info output
 
