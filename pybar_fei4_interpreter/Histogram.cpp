@@ -17,6 +17,7 @@ Histogram::~Histogram(void)
   deleteRelBcidArray();
   deleteTotPixelArray();
   deleteTdcPixelArray();
+  deleteMeanTotArray();
 }
 
 void Histogram::setStandardSettings()
