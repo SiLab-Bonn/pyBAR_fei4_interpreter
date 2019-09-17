@@ -564,22 +564,22 @@ void Interpret::getEventStatusCounters(unsigned int*& rEventStatusCounter, unsig
 {
   debug("getEventStatusCounters(...)");
   if (copy)
-    std::copy(_eventStatusCounter, _eventStatusCounter + __N_ERROR_CODES, rEventStatusCounter);
+    std::copy(_eventStatusCounter, _eventStatusCounter + __N_EVENT_STATUS_BITS, rEventStatusCounter);
   else
     rEventStatusCounter = _eventStatusCounter;
 
-  rNeventStatusCounters = __N_ERROR_CODES;
+  rNeventStatusCounters = __N_EVENT_STATUS_BITS;
 }
 
 void Interpret::getTriggerStatusCounters(unsigned int*& rTriggerStatusCounter, unsigned int& rNTriggerStatusCounters, bool copy)
 {
   debug(std::string("getTriggerStatusCounters(...)"));
   if (copy)
-    std::copy(_triggerStatusCounter, _triggerStatusCounter + __TRG_N_ERROR_CODES, rTriggerStatusCounter);
+    std::copy(_triggerStatusCounter, _triggerStatusCounter + __N_TRIGGER_STATUS_BITS, rTriggerStatusCounter);
   else
     rTriggerStatusCounter = _triggerStatusCounter;
 
-  rNTriggerStatusCounters = __TRG_N_ERROR_CODES;
+  rNTriggerStatusCounters = __N_TRIGGER_STATUS_BITS;
 }
 
 void Interpret::getTdcValues(unsigned int*& rTdcValue, unsigned int& rNtdcValues, bool copy)
@@ -1158,7 +1158,7 @@ void Interpret::allocateTriggerStatusCounterArray()
 {
   debug(std::string("allocateTriggerStatusCounterArray()"));
   try {
-    _triggerStatusCounter = new unsigned int[__TRG_N_ERROR_CODES];
+    _triggerStatusCounter = new unsigned int[__N_TRIGGER_STATUS_BITS];
   } catch (std::bad_alloc& exception) {
     error(std::string("allocateTriggerStatusCounterArray(): ") + std::string(exception.what()));
   }
@@ -1166,7 +1166,7 @@ void Interpret::allocateTriggerStatusCounterArray()
 
 void Interpret::resetTriggerStatusCounterArray()
 {
-  for (unsigned int i = 0; i < __TRG_N_ERROR_CODES; ++i)
+  for (unsigned int i = 0; i < __N_TRIGGER_STATUS_BITS; ++i)
     _triggerStatusCounter[i] = 0;
 }
 
@@ -1183,7 +1183,7 @@ void Interpret::allocateEventStatusCounterArray()
 {
   debug(std::string("allocateEventStatusCounterArray()"));
   try {
-    _eventStatusCounter = new unsigned int[__N_ERROR_CODES];
+    _eventStatusCounter = new unsigned int[__N_EVENT_STATUS_BITS];
   } catch (std::bad_alloc& exception) {
     error(std::string("allocateEventStatusCounterArray(): ") + std::string(exception.what()));
   }
@@ -1211,7 +1211,7 @@ void Interpret::allocateTdcTriggerDistanceArray()
 
 void Interpret::resetEventStatusCounterArray()
 {
-  for (unsigned int i = 0; i < __N_ERROR_CODES; ++i)
+  for (unsigned int i = 0; i < __N_EVENT_STATUS_BITS; ++i)
     _eventStatusCounter[i] = 0;
 }
 

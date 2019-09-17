@@ -107,7 +107,7 @@ const size_t __MAXARRAYSIZE=2000000;  // maximum buffer array size for the outpu
 const size_t __MAXHITBUFFERSIZE=4000000;  // maximum buffer array size for the hit buffer array (has to be bigger than hits in one event)
 
 // event status codes
-const uint32_t __N_ERROR_CODES=16;  // number of event error codes
+const uint32_t __N_EVENT_STATUS_BITS=16;  // number of event error codes
 const uint32_t __NO_ERROR=0;  // no error
 const uint32_t __HAS_SR=1;  // the event has service records
 const uint32_t __NO_TRG_WORD=2;  // the event has no trigger word, only for self-triggered data taking and injection
@@ -126,7 +126,7 @@ const uint32_t __MORE_THAN_ONE_HIT=8192;  // Events with more than one hit
 const uint32_t __TDC_INVALID=16384;  // Events with invalid TDC words
 
 // trigger status codes
-const uint32_t __TRG_N_ERROR_CODES=8;  // number of trigger error codes
+const uint32_t __N_TRIGGER_STATUS_BITS=8;  // number of trigger error codes
 const uint32_t __TRG_NO_ERROR=0;  // no trigger error
 const uint32_t __TRG_NUMBER_INC_ERROR=1;  // two consecutive triggern numbers are not increasing by exactly one (counter overflow case considered correctly)
 const uint32_t __TRG_NUMBER_MORE_ONE=2;  // more than one trigger per event
