@@ -200,8 +200,8 @@ void Histogram::addHits(HitInfo*& rHitInfo, const unsigned int& rNhits)
       }
       if (_createTdcPixelHist) {
         if (_tdcPixel != 0) {
-          if (tTdc >= __N_TDC_PIXEL_VALUES) {  // get TDC values from single hit events
-            info("TDC value out of range:" + IntToStr(tTdc) + ">" + IntToStr(__N_TDC_PIXEL_VALUES));
+          if (tTdc >= __N_TDC_VALUES) {  // get TDC values from single hit events
+            info("TDC value out of range:" + IntToStr(tTdc) + ">" + IntToStr(__N_TDC_VALUES));
             tTdc = 0;
           }
           _tdcPixel[(size_t)tColumnIndex + (size_t)tRowIndex * (size_t)RAW_DATA_MAX_COLUMN + (size_t)tTdc * (size_t)RAW_DATA_MAX_COLUMN * (size_t)RAW_DATA_MAX_ROW] += 1;
@@ -378,7 +378,7 @@ void Histogram::resetTdcPixelArray()
     if (_tdcPixel != 0) {
       for (size_t i = 0; i < RAW_DATA_MAX_COLUMN; i++)
         for (size_t j = 0; j < RAW_DATA_MAX_ROW; j++)
-          for (size_t k = 0; k < __N_TDC_PIXEL_VALUES; k++)
+          for (size_t k = 0; k < __N_TDC_VALUES; k++)
             _tdcPixel[i + j * (size_t)RAW_DATA_MAX_COLUMN + k * (size_t)RAW_DATA_MAX_COLUMN * (size_t)RAW_DATA_MAX_ROW] = 0;
     } else {
       throw std::runtime_error("Output TDC pixel array array not set.");

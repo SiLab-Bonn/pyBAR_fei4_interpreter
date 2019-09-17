@@ -166,7 +166,6 @@ const uint32_t RAW_DATA_MAX_ROW=336;
 
 // TDC macros
 #define __N_TDC_VALUES 4096
-#define __N_TDC_PIXEL_VALUES 2048
 #define __N_TDC_TRG_DIST_VALUES 256
 #define TDC_HEADER 0x40000000  // 0100 xxxx xxxx xxxx xxxx xxxx xxxx xxxx, x may contain user data
 #define TDC_HEADER_MASK 0xF0000000  // select TDC header, no one-hot header
