@@ -840,11 +840,11 @@ void Interpret::addEvent()
       warning(std::string("addEvent: # trigger words > 1 at event " + LongIntToStr(_nEvents)));
   }
   // 4095 is TDC value overflow, 254 is TDC trigger distance overflow
-  if ((tTdcValue == (__N_TDC_VALUES - 1)) || (_haveTdcTriggerDistance && (tTdcTriggerDistance == 254))) {
+  if (((tEventStatus & __TDC_WORD) == __TDC_WORD) && ((tTdcValue == (__N_TDC_VALUES - 1)) || (_haveTdcTriggerDistance && (tTdcTriggerDistance == 254)))) {
     addEventStatus(__TDC_OVERFLOW);
   }
   // 0 is invalid TDC value, 255 is invalied TDC trigger distance
-  if ((tTdcValue == 0) || (_haveTdcTriggerDistance && (tTdcTriggerDistance == 255))) {
+  if (((tEventStatus & __TDC_WORD) == __TDC_WORD) && ((tTdcValue == 0) || (_haveTdcTriggerDistance && (tTdcTriggerDistance == 255)))) {
     addEventStatus(__TDC_INVALID);
   }
 
