@@ -852,7 +852,7 @@ void Interpret::addEvent()
   if (tTotalHits > _nMaxHitsPerEvent)
     _nMaxHitsPerEvent = tTotalHits;
   histogramTriggerStatusCode();
-  histogramErrorCode();
+  histogramEventStatusCode();
   if (_createMetaDataWordIndex) {
     if (_actualMetaWordIndex < _metaWordIndexLength) {
       _metaWordIndex[_actualMetaWordIndex].eventIndex = _nEvents;
@@ -1085,7 +1085,7 @@ void Interpret::histogramTriggerStatusCode()
   }
 }
 
-void Interpret::histogramErrorCode()
+void Interpret::histogramEventStatusCode()
 {
   unsigned int tBitPosition = 0;
   for (unsigned short int iErrorCode = tEventStatus; iErrorCode != 0; iErrorCode = iErrorCode >> 1) {

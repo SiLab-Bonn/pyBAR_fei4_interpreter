@@ -103,8 +103,8 @@ private:
   // Service record / error histogramming methods
   void addTriggerStatus(const unsigned char& pStatus);  // adds the trigger error code to the existing error code
   void addEventStatus(const unsigned short int& pStatus);  // adds the error code to the existing error code
-  void histogramTriggerStatusCode();  // adds the event trigger error code to the histogram
-  void histogramErrorCode();  // adds the event error code to the histogram
+  void histogramTriggerStatusCode();  // adds the trigger status code to the histogram
+  void histogramEventStatusCode();  // adds the event status code to the histogram
   void addServiceRecord(const unsigned char& pSRcode, const unsigned int& pSRcounter);  // adds the service record code to SR histogram
   void addTdcValue(const unsigned int& pTdcValue);  // adds the TDC value to TDC histogram
   void addTdcTriggerDistanceValue(const unsigned int& pTdcTriggerDistanceValue);  // adds the TDC distance value to TDC histogram
