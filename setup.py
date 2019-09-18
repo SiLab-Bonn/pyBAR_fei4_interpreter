@@ -45,8 +45,8 @@ f = open('VERSION', 'r')
 version = f.readline().strip()
 f.close()
 
-author = 'David-Leon Pohl'
-author_email = 'pohl@physik.uni-bonn.de'
+author = 'Jens Janssen, David-Leon Pohl'
+author_email = 'janssen@physik.uni-bonn.de, pohl@physik.uni-bonn.de'
 
 # Requirements from requirements.txt
 with open('requirements.txt') as f:
@@ -58,7 +58,7 @@ setup(
     description='pyBAR_fei4_interpreter - Fast ATLAS FE-I4 raw data interpreter for pyBAR',
     url='https://github.com/SiLab-Bonn/pyBAR_fei4_interpreter',
     license='BSD 3-Clause ("BSD New" or "BSD Simplified") License',
-    long_description='This package can be used to interpred raw data from the ATLAS FE-I4 taken with the readout framework pyBAR. It also contains histogramming functions and interpretation tools. The interpretation takes place in fast C++ code to increase the speed.',
+    long_description='Interpreter for ATLAS FE-I4A/B raw data for the readout framework pyBAR. It also provides histogramming functions. The interpreter is written in C++ to achieve a high throughput.',
     author=author,
     maintainer=author,
     author_email=author_email,
@@ -70,5 +70,6 @@ setup(
     ext_modules=cythonize(extensions),
     include_dirs=[np.get_include()],
     cmdclass={'build_ext': build_ext_opt},
+    python_requires='>=2.7',
     platforms='any'
 )

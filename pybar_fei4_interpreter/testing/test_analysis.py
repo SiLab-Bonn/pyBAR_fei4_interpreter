@@ -98,7 +98,7 @@ class TestAnalysis(unittest.TestCase):
             del interpreter
             del histogram
 
-    def test_data_alignement(self):  # Test if the data alignment is correct (important to detect 32/64 bit related issues)
+    def test_data_alignement(self):  # Test if the data alignment is correct (important to detect data alignment issues)
         hits = np.empty((1,), dtype=[('event_number', np.uint64),
                                      ('trigger_number', np.uint32),
                                      ('trigger_time_stamp', np.uint32),
@@ -109,12 +109,13 @@ class TestAnalysis(unittest.TestCase):
                                      ('tot', np.uint8),
                                      ('BCID', np.uint16),
                                      ('TDC', np.uint16),
-                                     ('TDC_time_stamp', np.uint8),
+                                     ('TDC_time_stamp', np.uint16),
+                                     ('TDC_trigger_distance', np.uint8),
                                      ('trigger_status', np.uint8),
                                      ('service_record', np.uint32),
                                      ('event_status', np.uint16)
                                      ])
-        self.assertTrue(self.interpreter.get_hit_size() == hits.itemsize)
+        self.assertEqual(self.interpreter.get_hit_size(), hits.itemsize)
 
     def test_analysis_utils_get_n_cluster_in_events(self):  # check compiled get_n_cluster_in_events function
         event_numbers = np.array([[0, 0, 1, 2, 2, 2, 4, 4000000000, 4000000000, 40000000000, 40000000000], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], dtype=np.int64)  # use data format with non linear memory alignment
@@ -162,18 +163,12 @@ class TestAnalysis(unittest.TestCase):
         self.assertTrue(np.all(occ_hist_cpp == occ_hist_python))
 
     def test_trigger_data_format(self):
-        raw_data = np.array([82411778, 82793472, 82411779, 82794496, 82411780, 82795520, 82379013, 82379014,
-                             82379015, 82379016, 67240383, 82379017, 82379018, 82379019, 82379020, 82379021,
-                             82379022, 82379023, 82379024, 82379025, 3611295745, 82380701, 82380702, 82380703,
-                             82380704, 82380705, 82380706, 82380707, 67240383, 82380708, 82380709, 82380710,
-                             82380711, 82380712, 82380713, 82380714, 82380715, 82380716, 3611361282, 82381368,
-                             82381369, 82381370, 82381371, 82381372, 82381373, 82381374, 67240367, 82381375,
-                             82381376, 82381377, 82381378, 82381379, 82381380, 82381381, 82381382, 82381383,
-                             3611426819, 82382035, 82382036, 82382037, 82382038, 82382039, 82382040, 82382041,
-                             67240383, 82382042, 82382043, 82382044, 82382045, 82382046, 82382047, 82382048,
-                             82382049, 82382050, 3611492356, 82383726, 82383727, 82383728, 82383729, 82383730,
-                             82383731, 82383732, 67240367, 82383733, 82383734, 82383735, 82383736, 82383737,
-                             82383738, 82383739, 82383740, 82383741, 3611557893], np.uint32)
+        raw_data = np.array([3611295745, 82411778, 82793472, 82411779, 82794496, 82411780, 82795520, 82379013, 82379014, 82379015, 82379016, 67240383, 82379017, 82379018, 82379019, 82379020, 82379021, 82379022, 82379023, 82379024, 82379025,
+                             3611361282, 82380701, 82380702, 82380703, 82380704, 82380705, 82380706, 82380707, 67240383, 82380708, 82380709, 82380710, 82380711, 82380712, 82380713, 82380714, 82380715, 82380716,
+                             3611426819, 82381368, 82381369, 82381370, 82381371, 82381372, 82381373, 82381374, 67240367, 82381375, 82381376, 82381377, 82381378, 82381379, 82381380, 82381381, 82381382, 82381383,
+                             3611492356, 82382035, 82382036, 82382037, 82382038, 82382039, 82382040, 82382041, 67240383, 82382042, 82382043, 82382044, 82382045, 82382046, 82382047, 82382048, 82382049, 82382050,
+                             3611557893, 82383726, 82383727, 82383728, 82383729, 82383730, 82383731, 82383732, 67240367, 82383733, 82383734, 82383735, 82383736, 82383737, 82383738, 82383739, 82383740, 82383741],
+                            np.uint32)
         raw_data_tlu = np.array([3611295745, 3611361282, 3611426819, 3611492356, 3611557893], np.uint32)
         interpreter = PyDataInterpreter()
         histograming = PyDataHistograming()
@@ -216,7 +211,7 @@ class TestAnalysis(unittest.TestCase):
             array_fast = analysis_utils.hist_1d_index(x, shape=shape)
         except IndexError:
             exception_ok = True
-        except:  # other exception that should not occur
+        except Exception:  # other exception that should not occur
             pass
         self.assertTrue(exception_ok & np.all(array == array_fast))
 
@@ -231,7 +226,7 @@ class TestAnalysis(unittest.TestCase):
             array_fast = analysis_utils.hist_2d_index(x, y, shape=shape)
         except IndexError:
             exception_ok = True
-        except:  # other exception that should not occur
+        except Exception:  # other exception that should not occur
             pass
         self.assertTrue(exception_ok & np.all(array == array_fast))
 
@@ -248,9 +243,10 @@ class TestAnalysis(unittest.TestCase):
                 array_fast = analysis_utils.hist_3d_index(x, y, z, shape=shape)
             except IndexError:
                 exception_ok = True
-            except:  # other exception that should not occur
+            except Exception:  # other exception that should not occur
                 pass
             self.assertTrue(exception_ok & np.all(array == array_fast))
+
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestAnalysis)

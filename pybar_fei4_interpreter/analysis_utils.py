@@ -1,8 +1,9 @@
 """This class provides often needed analysis functions that had to be speed up using C++.
 """
 
-import numpy as np
 import logging
+
+import numpy as np
 from tables import dtype_from_descr
 
 from pybar_fei4_interpreter import analysis_functions
@@ -74,7 +75,7 @@ def hist_1d_index(x, shape):
 
     """
     if len(shape) != 1:
-        raise InvalidInputError('The shape has to describe a 1-d histogram')
+        raise ValueError('The shape has to describe a 1-d histogram')
 
     # change memory alignment for c++ library
     x = np.ascontiguousarray(x.astype(np.int32))
@@ -101,7 +102,7 @@ def hist_2d_index(x, y, shape):
 
     """
     if len(shape) != 2:
-        raise InvalidInputError('The shape has to describe a 2-d histogram')
+        raise ValueError('The shape has to describe a 2-d histogram')
 
     # change memory alignment for c++ library
     x = np.ascontiguousarray(x.astype(np.int32))
@@ -130,7 +131,7 @@ def hist_3d_index(x, y, z, shape):
 
     """
     if len(shape) != 3:
-        raise InvalidInputError('The shape has to describe a 3-d histogram')
+        raise ValueError('The shape has to describe a 3-d histogram')
     # change memory alignment for c++ library
     x = np.ascontiguousarray(x.astype(np.int32))
     y = np.ascontiguousarray(y.astype(np.int32))
