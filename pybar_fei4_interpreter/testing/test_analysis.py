@@ -110,11 +110,12 @@ class TestAnalysis(unittest.TestCase):
                                      ('BCID', np.uint16),
                                      ('TDC', np.uint16),
                                      ('TDC_time_stamp', np.uint16),
+                                     ('TDC_trigger_distance', np.uint8),
                                      ('trigger_status', np.uint8),
                                      ('service_record', np.uint32),
                                      ('event_status', np.uint16)
                                      ])
-        self.assertTrue(self.interpreter.get_hit_size() == hits.itemsize)
+        self.assertEqual(self.interpreter.get_hit_size(), hits.itemsize)
 
     def test_analysis_utils_get_n_cluster_in_events(self):  # check compiled get_n_cluster_in_events function
         event_numbers = np.array([[0, 0, 1, 2, 2, 2, 4, 4000000000, 4000000000, 40000000000, 40000000000], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], dtype=np.int64)  # use data format with non linear memory alignment

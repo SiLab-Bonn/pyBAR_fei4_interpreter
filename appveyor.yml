@@ -8,6 +8,12 @@ environment:
     - PYTHON_VERSION: 2.7
       MINICONDA: C:\Miniconda-x64
       PYTHON_ARCH: "64"
+    - PYTHON_VERSION: 3.7
+      MINICONDA: C:\Miniconda
+      PYTHON_ARCH: "32"
+    - PYTHON_VERSION: 3.7
+      MINICONDA: C:\Miniconda-x64
+      PYTHON_ARCH: "64"
 
 init:
   - "ECHO %PYTHON%"
@@ -17,13 +23,14 @@ init:
 install:
   # Miniconda setup + necessary external packages
   - set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%  # Miniconda is already installed on appveyor: https://github.com/appveyor/ci/issues/359
-  - conda install --yes cython nose numpy pytables
-  - pip install -r requirements.txt
-  - python.exe setup.py develop
+  - conda update --yes conda
+  - conda install --yes cython numpy pytables nose
+  - pip install -e .
+  - conda list
 
 test_script:
   - nosetests
-  
+
 after_test:
   - python setup.py bdist_wheel
 
