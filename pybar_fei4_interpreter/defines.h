@@ -7,7 +7,11 @@
 #include <stddef.h>
 // for (u)int64_t event_number
 #ifdef _MSC_VER
+#if _MSC_VER >= 1600  // MSVC++ 10 (2010)
+#include <stdint.h>
+#else
 #include "external/stdint.h"
+#endif
 #else
 #include <stdint.h>
 #endif
