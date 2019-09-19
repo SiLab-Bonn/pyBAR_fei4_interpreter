@@ -14,6 +14,11 @@ environment:
     - PYTHON_VERSION: 3.7
       MINICONDA: C:\Miniconda37-x64
       PYTHON_ARCH: "64"
+  PYPI_PASSWORD:
+    secure: Zw0hha0+/4KCvYqgBYpOHGbrc9jrvtHq8N0xXkWSvLk=
+
+platform:
+  - x64
 
 init:
 #  - ps: Start-FileDownload 'http://download.microsoft.com/download/7/9/6/796EF2E4-801B-4FC4-AB28-B59FBF6D907B/VCForPython27.msi' C:\VCForPython27.msi; echo "Done"
@@ -24,7 +29,7 @@ install:
   - set PATH=%MINICONDA%;%MINICONDA%\Scripts;%MINICONDA%\Library\bin;%PATH%
   - conda update --yes conda
   - conda info -a
-  - conda install --yes cython numpy pytables nose
+  - conda install --yes cython numpy pytables nose twine
   - pip install -e .
   - conda list
 
@@ -33,6 +38,19 @@ test_script:
 
 after_test:
   - python setup.py bdist_wheel
+  - ps: rm dist/*.egg
 
 artifacts:
   - path: dist\*
+    name: pypiartifacts
+
+deploy_script:
+  - echo "Starting deployment"
+  - echo [distutils] > %USERPROFILE%\\.pypirc
+  - echo index-servers = >> %USERPROFILE%\\.pypirc
+  - echo     pypi >> %USERPROFILE%\\.pypirc
+  - echo [pypi] >> %USERPROFILE%\\.pypirc
+  - echo username=laborleben >> %USERPROFILE%\\.pypirc
+  - echo password=%PYPI_PASSWORD% >> %USERPROFILE%\\.pypirc
+  - ps: If ($env:APPVEYOR_REPO_TAG -eq "true" -And $env:APPVEYOR_REPO_BRANCH -eq "master") { Invoke-Expression "twine upload --skip-existing dist/*.whl" 2>$null } Else { write-output "Not on a tag on master, won't deploy"}
+  - echo "Finished deployment"
