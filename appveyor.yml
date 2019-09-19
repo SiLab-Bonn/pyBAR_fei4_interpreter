@@ -9,21 +9,21 @@ environment:
       MINICONDA: C:\Miniconda-x64
       PYTHON_ARCH: "64"
     - PYTHON_VERSION: 3.7
-      MINICONDA: C:\Miniconda
+      MINICONDA: C:\Miniconda37
       PYTHON_ARCH: "32"
     - PYTHON_VERSION: 3.7
-      MINICONDA: C:\Miniconda-x64
+      MINICONDA: C:\Miniconda37-x64
       PYTHON_ARCH: "64"
 
 init:
-  - "ECHO %PYTHON%"
-  - ps: Start-FileDownload 'http://download.microsoft.com/download/7/9/6/796EF2E4-801B-4FC4-AB28-B59FBF6D907B/VCForPython27.msi' C:\VCForPython27.msi; echo "Done"
-  - cmd: msiexec /i C:\VCForPython27.msi /quiet /qn
+#  - ps: Start-FileDownload 'http://download.microsoft.com/download/7/9/6/796EF2E4-801B-4FC4-AB28-B59FBF6D907B/VCForPython27.msi' C:\VCForPython27.msi; echo "Done"
+#  - cmd: msiexec /i C:\VCForPython27.msi /quiet /qn
 
 install:
   # Miniconda setup + necessary external packages
-  - set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%  # Miniconda is already installed on appveyor: https://github.com/appveyor/ci/issues/359
+  - set PATH=%MINICONDA%;%MINICONDA%\Scripts;%MINICONDA%\Library\bin;%PATH%
   - conda update --yes conda
+  - conda info -a
   - conda install --yes cython numpy pytables nose
   - pip install -e .
   - conda list
